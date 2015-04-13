@@ -8,16 +8,25 @@ var Solaria = (function () {
     var presets = {};
     //The objects in the current level
     var objects = {};
-    
+
     var levels = [];
     var levelsNames = [];
     var currentLevel = 0;
 
     var fps = 0;
+    var started = false;
+
+    //The number of pending assets to load
+    var loading = 0;
 
     //The animation engine used
-    var animationEngine = new Spritesheet();
+    var animationEngine;
 
+    //Holds the setInterval return value
+    var intervalholder;
+
+    //A reference to the loader
+    var loader;
 
 
     //...................................
@@ -30,10 +39,67 @@ var Solaria = (function () {
    * @param {Number} fps - The frames per second 
    */
     solaria.start = function (fps) {
-        this.fps = fps;
-        this.started = true;
+        fps = fps;
+        started = true;
         solaria.loadLevel(0);
     }
+
+    /**
+*Starts (or restarts) the engine execution with the data loaded
+*
+*/
+    solaria.setup = function () {
+        engine.event = [{ name: "setup" }];
+        engine.processEvents();
+        engine.event = [];
+        engine.checkLoadQueue();
+    }
+
+    /**
+  *Pauses the execution of the engine
+  *
+  */
+    solaria.pause = function () {
+        clearInterval(intervalholder);
+    }
+
+    /**
+   *Gets the value of a globar variable
+   * @param {String} variable - The name of the variable
+   */
+    solaria.getEngineVar = function (variable) {
+        return engine.globalvars[variable];
+    }
+
+
+    /**
+ *Sets the value of a globar variable
+ @param {String} variable - The name of the variable
+ * @param {Object} value - The value of the variable
+ */
+    solaria.setEngineVar = function (variable, value) {
+        engine.globalvars[variable] = value;
+    }
+
+
+    /**
+*Gets an object
+*@param {Object} variable - The object handler
+*/
+    solaria.getObject = function (variable) {
+        return engine.body[variable];
+    }
+
+
+    /**
+*Sets the animation engine
+*@param {Object} engine - The animation engine
+*/
+    solaria.setAnimationEngine = function (engine) {
+        animationEngine = engine;
+    }
+
+
 
     //....................
     //     JS Tools
@@ -160,7 +226,7 @@ var Solaria = (function () {
     }
 
 
-  
+
 
 
     //...................
@@ -207,7 +273,7 @@ var Solaria = (function () {
     //But needed if implementing loading presets from a file != .js
     function addPresetHandlerFromText(name, event, functiontext) {
         try {
-            addPresetEvent(name,event, new Function("event", functiontext));
+            addPresetEvent(name, event, new Function("event", functiontext));
         } catch (e) {
             debugLog("Syntax error in object " + name + ", event " + event, 1)
         }
@@ -232,7 +298,7 @@ var Solaria = (function () {
     function implementPreset(name, type) {
         var newone = inheritObject(presets.list[type]);
         newone.vars["name"] = name;
-        newone.renderId = -1;
+        newone.spriteholder = -1;
         return newone;
     };
 
@@ -241,17 +307,17 @@ var Solaria = (function () {
      * @param {Object} presets - The object holding the presets
      * @param {Function} callback - A callback to be called after the presets are loaded
      */
-    solaria.loadPresets= function(presets,callback) {
+    solaria.loadPresets = function (presets, callback) {
         for (var i = 0; i < presets.length; i++) {
             var thispreset = presets[i];
-           
+
             if (thispreset.inherits != undefined) {
                 inheritPreset(thispreset.name, thispreset.inherits);
             } else {
                 createPreset(thispreset.name);
             }
             setPresetSprite(thispreset.name, thispreset.sprite);
-           
+
 
             if (typeof thispreset.vars != "undefined") {
                 for (var j = 0; j < thispreset.vars.length; j++) {
@@ -285,28 +351,61 @@ var Solaria = (function () {
     //      Levels
     //...................
 
-    function loadLevel(n) {
+    /**
+    * Loads a level
+    * @param {Number} n - The level number
+    */
+    solaria.loadLevel = function (n) {
         currentLevel = n;
         for (var j in engine.body) {
             objects[j].execute_event("_exit", []);
         }
-        animationEngine.clear();
         setEngineVar("currentlevel", n);
-        pause();
+        solaria.pause();
         loader.show();
         deleteSprites();
+        //Just in case?
+        animationEngine.clear();
         objects = loadLevelObjects(engine.levels[n]).objects;
         assignSprites();
-        setup();
-
+        solaria.setup();
     };
 
-     function loadLevelObjects(thislevel) {
+    /**
+ * Loads a level
+ * @param {String} name - The level id
+ */
+    solaria.loadLevelByID = function (name) {
+        for (var i = 0; i < engine.levelsnames.length; i++) {
+            if (name == engine.levelsnames[i]) {
+                engine.loadLevel(i);
+                return;
+            }
+        }
+    }
+
+
+    /**
+ * Loads the levels data from a XML file
+ * @param {String} url - The url of the .xml
+  * @param {Function} callback - A callback function
+ */
+
+    solaria.loadLevelsFromXML = function (url, callback) {
+        loadXMLFile(url, function (xmlDoc) {
+            for (var i = 0; i < xmlDoc.getElementsByTagName("level").length; i++) {
+                levels.push(xmlDoc.getElementsByTagName("level")[i]);
+                levelsNames.push(xmlDoc.getElementsByTagName("level")[i].getAttributeNode("id").value);
+            }
+        }, callback);
+    };
+
+    function loadLevelObjects(thislevel) {
         var level = {};
         level.objects = [];
         for (var j = 0; j < thislevel.getElementsByTagName("object").length; j++) {
             var thisobject = thislevel.getElementsByTagName("object")[j];
-            var object = engine_presets.implement(thisobject.getAttributeNode("name").value, thisobject.getAttributeNode("type").value);
+            var object = implementPreset(thisobject.getAttributeNode("name").value, thisobject.getAttributeNode("type").value);
             if (thisobject.getAttributeNode("static") != undefined) {
                 if (thisobject.getAttributeNode("static").value == "true") {
                     object.isstatic = true;
@@ -316,20 +415,118 @@ var Solaria = (function () {
             } else {
                 object.isstatic = false;
             }
-            object.x = +thisobject.getAttributeNode("x").value;
-            object.y = +thisobject.getAttributeNode("y").value;
+            object.vars["_x"] = +thisobject.getAttributeNode("x").value;
+            object.vars["_y"] = +thisobject.getAttributeNode("y").value;
+            if (thisobject.getAttributeNode("z") != undefined) {
+                object.vars["_z"] = +(thisobject.getAttributeNode("z").value);
+            } else {
+                object.vars["_z"] = 0;
+            }
             if (thisobject.getAttributeNode("vars")) {
                 addJSONparameters(object.vars, thisobject.getAttributeNode("vars").value);
-            }
-            object.eventqueue = [];
-            if (thisobject.getAttributeNode("zindex") != undefined) {
-                object.vars.z_index = +(thisobject.getAttributeNode("zindex").value);
-            } else {
-                object.vars.z_index = 0;
             }
             level.objects.push(object);
         }
         return level;
+    }
+    //The load queue is like a semaphore in C!
+    //It starts as 0, and it is incremented (wait) for each resource that must be loaded
+    //Then it is increased for each loaded resource (signal), and if it is 0 again the engine continues
+    //This avoids to start beofre every asset is loaded
+    function addLoadQueue  () {
+        loading++;
+    };
+    function removeLoadQueue () {
+        loading--;
+        checkLoadQueue();
+    };
+    function checkLoadQueue () {
+        if (loading == 0 && started == true) {
+            intervalholder = setInterval(loop, Math.round(1000 / fps));
+            loader.hide();
+        }
+    }
+
+    //...................
+    //     Sprites
+    //...................
+
+    function assignSprites() {
+        animationEngine.setCamera(0, 0);
+        for (var i = 0; i < objects.length; i++) {
+            if (objects[i].sprite != undefined) {
+                if (objects[i].sprite != undefined) {
+                    objects[i].spriteholder = animEngine.addObject(objects[i].vars["_sprite"], undefined, objects[i].vars["_x"], objects[i].vars["_y"], objects[i].vars["_z"], objects[i].vars["_isstatic"], objects[i].vars["_doesnottimetravel"]);
+                }
+            }
+        }
+    }
+
+    function deleteSprites() {
+        for (var i = 0; i < objects.length; i++) {
+            if (objects[i].spriteholder != -1) {
+                animationEngine.deleteObject(objects[i].spriteholder);
+            }
+        }
+    };
+
+    //......................
+    //    Main loop and events
+    //......................
+
+    function loop() {
+
+        //Collisions
+        for (var i = 0; i < objects.length; i++) {
+            for (var j = 0; j < objects.length; j++) {
+                if (i != j) {
+                    var b1 = objects[i];
+                    var b2 = objects[j];
+                    for (var k = 0; k < b1.boundingbox.length; k++) {
+
+                        for (var l = 0; l < b2.collisionpoint.length; l++) {
+                            var box = { x: b1.boundingbox[k].x + b1.vars["_x"], y: b1.boundingbox[k].y + b1.vars["_y"], w: b1.boundingbox[k].w, h: b1.boundingbox[k].h };
+                            var point = { x: b2.collisionpoint[l].x + b2.vars["_x"], y: b2.collisionpoint[l].y + b2.vars["_y"] };
+                            if (isPinsideB(point, box) == true) {
+                                if (b1.execute_event("collideB", { object: j, box: k, point: l }) == "exit") {
+                                    return;
+                                }
+                                if (b2.execute_event("collideP", { object: i, box: k, point: l }) == "exit") {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (solaria.execute_event("loop") == "exit") {
+            return;
+        }
+
+
+        //animation
+        for (var i in objects) {
+            if (objects[i].spriteholder != undefined) {
+                animationEngine.setX(objects[i].spriteholder, objects[i].vars["_x"]);
+                animationEngine.setY(objects[i].spriteholder, objects[i].vars["_y"]);
+                animationEngine.setZindex(objects[i].spriteholder, objects[i].vars["_z"]);
+            }
+        }
+
+
+
+    }
+
+    solaria.execute_event = function (name, e_args) {
+        for (var i in objects) {
+            var body = objects[i];
+            if (body.execute_event(name, e_args) == "exit") {
+                return "exit";
+            }
+        }
+
     }
 
     return solaria;
