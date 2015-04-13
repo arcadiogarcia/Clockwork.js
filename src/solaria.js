@@ -1,5 +1,5 @@
 ﻿//Solaria engine
-//Arcadio García Salvadores
+//Arcadio Garcia Salvadores
 
 var Solaria = (function () {
     //This object stores the public functions
@@ -26,7 +26,7 @@ var Solaria = (function () {
     var intervalholder;
 
     //A reference to the loader
-    var loader;
+    solaria.loader;
 
 
     //...................................
@@ -362,7 +362,7 @@ var Solaria = (function () {
         }
         setEngineVar("currentlevel", n);
         solaria.pause();
-        loader.show();
+        solaria.loader.show();
         deleteSprites();
         //Just in case?
         animationEngine.clear();
@@ -443,7 +443,7 @@ var Solaria = (function () {
     function checkLoadQueue () {
         if (loading == 0 && started == true) {
             intervalholder = setInterval(loop, Math.round(1000 / fps));
-            loader.hide();
+            solaria.loader.hide();
         }
     }
 
