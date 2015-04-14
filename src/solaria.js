@@ -238,6 +238,7 @@ var Solaria = (function () {
         presets[name] = {
             eventfunction: {},
             vars: {},
+            name:name,
             boundingbox: [],
             collisionpoint: [],
             setVar: function (variable, value) {
@@ -252,6 +253,15 @@ var Solaria = (function () {
                 } else {
                     debugLog("Event handler " + name + " does not exist in " + this.name, 2);
                 }
+            },
+            instanceOf: function (name) {
+                if(this.name==name){
+                    return true;
+                }
+                if (typeof this.prototype.instanceOf != "undefined") {
+                    return this.prototype.instanceOf(name);
+                }
+                return false;
             }
         };
     }
@@ -301,6 +311,7 @@ var Solaria = (function () {
         newone.spriteholder = -1;
         return newone;
     };
+
 
     /**
      *Loads the presets from a JavaScript object
