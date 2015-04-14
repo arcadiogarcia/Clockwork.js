@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="dogPreset.js"></script>
+    <script src="../../src/Solaria.js"></script>
+    <script src="../../src/collisions/pointsAndBoxes.js"></script>
+    <script src="../../src/presets/basicMouse.js"></script>
+    <script src="../shared/spritesheet.js"></script>
+</head>
+<body style="background-color:#000;">
+    <canvas id="canvas" width="800" height="400" style="background-color:#FFF;"></canvas>
+    <script>
+        //First we set up a Spritesheet.js instance to render the scene
+        //Learn more about Spritesheet.js at https://github.com/arcadiogarcia/Spritesheet.js/
+
+        var canvasAnimation = new Spritesheet();
+        canvasAnimation.setUp(document.getElementById("canvas"), 30);
+        canvasAnimation.setBufferSize(800, 400);
+        canvasAnimation.asyncLoad("../shared/spritesheet_paradog.xml", callback_load);
+
+        //This function is executed after Spritesheet.js loads
+        function callback_load() {
+            //This is where Solaria.js starts
+            var engineInstance = new Solaria();
+            engineInstance.setAnimationEngine(canvasAnimation);
+            engineInstance.registerCollision(SolariaCollisions.pointsAndBoxes);
+            engineInstance.loadPresets(basicClickPreset);
+            engineInstance.loadPresets(dog);
+            engineInstance.loadLevelsFromXML("levels.xml", function () {
+                engineInstance.start(30, document.getElementById("canvas"));
+            })  
+        }
+    </script>
+</body>
+</html>

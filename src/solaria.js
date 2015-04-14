@@ -8,6 +8,8 @@ var Solaria = (function () {
     var presets = {};
     //The objects in the current level
     var objects = {};
+    //The engine global variables
+    var globalvars = {};
 
     var levels = [];
     var levelsNames = [];
@@ -32,6 +34,10 @@ var Solaria = (function () {
     //A reference to the loader
     solaria.loader;
 
+    //The DOM element that "holds" the engine
+    //It will be used for input detection
+    var DOMholder;
+
 
     //...................................
     //   Engine control
@@ -42,10 +48,11 @@ var Solaria = (function () {
    *Starts the engine and loads the firt level
    * @param {Number} fps - The frames per second 
    */
-    solaria.start = function (fps) {
-        fps = fps;
+    solaria.start = function (newfps, DOMelement) {
+        fps = newfps;
         started = true;
         solaria.loadLevel(0);
+        DOMholder=DOMelement;
     }
 
     /**
@@ -54,7 +61,7 @@ var Solaria = (function () {
 */
     solaria.setup = function () {
         solaria.execute_event("#setup");
-        engine.checkLoadQueue();
+        checkLoadQueue();
     }
 
     /**
@@ -66,11 +73,11 @@ var Solaria = (function () {
     }
 
     /**
-   *Gets the value of a globar variable
+   *Gets the value of a global variable
    * @param {String} variable - The name of the variable
    */
     solaria.getEngineVar = function (variable) {
-        return engine.globalvars[variable];
+        return globalvars[variable];
     }
 
 
@@ -80,7 +87,7 @@ var Solaria = (function () {
  * @param {Object} value - The value of the variable
  */
     solaria.setEngineVar = function (variable, value) {
-        engine.globalvars[variable] = value;
+        globalvars[variable] = value;
     }
 
 
@@ -268,15 +275,15 @@ var Solaria = (function () {
     }
 
     function inheritPreset(name, parent) {
-        presets.list[name] = inheritObject(presets.list[parent]);
-        presets.list[name].vars = inheritObject(presets.list[parent].vars);
-        presets.list[name].eventfunction = inheritObject(engine_presets.list[parent].eventfunction);
-        presets.list[name].collision = inheritObject(engine_presets.list[parent].collision);
+        presets[name] = inheritObject(presets[parent]);
+        presets[name].vars = inheritObject(presets[parent].vars);
+        presets[name].eventfunction = inheritObject(presets[parent].eventfunction);
+        presets[name].collision = inheritObject(presets[parent].collision);
     }
 
 
     function addPresetHandler(name, event, somefunction) {
-        presets.list[name].eventfunction[event] = somefunction;
+        presets[name].eventfunction[event] = somefunction;
     }
 
     //Not used anymore, slower and less secure than just addPreset
@@ -290,19 +297,19 @@ var Solaria = (function () {
     };
 
     function addPresetVar(name, variable, value) {
-        presets.list[name].vars[variable] = value;
+        presets[name].vars[variable] = value;
     };
 
     function setPresetSprite(name, sprite) {
-        presets.list[name].sprite = sprite;
+        presets[name].sprite = sprite;
     };
 
     function addPresetCollision(name, type, object) {
-        presets.list[name].collision[type].push(object);
+        presets[name].collision[type].push(object);
     };
 
     function implementPreset(name, type) {
-        var newone = inheritObject(presets.list[type]);
+        var newone = inheritObject(presets[type]);
         newone.vars["name"] = name;
         newone.spriteholder = -1;
         return newone;
@@ -312,9 +319,8 @@ var Solaria = (function () {
     /**
      *Loads the presets from a JavaScript object
      * @param {Object} presets - The object holding the presets
-     * @param {Function} callback - A callback to be called after the presets are loaded
      */
-    solaria.loadPresets = function (presets, callback) {
+    solaria.loadPresets = function (presets) {
         for (var i = 0; i < presets.length; i++) {
             var thispreset = presets[i];
 
@@ -335,7 +341,7 @@ var Solaria = (function () {
             if (typeof thispreset.collision != "undefined") {
                 for (var j = 0; j < collisions.shapes.length; j++) {
                     var thistype = thispreset.collision[collisions.shapes[j]];
-                    presets.list[thispreset.name].collision[collisions.shapes[j]] = [];
+                    presets[thispreset.name].collision[collisions.shapes[j]] = [];
                     for (var k = 0; k < thistype.length; k++) {
                         addPresetCollision(thispreset.name, collisions.shapes[j],thispreset.points[k]);
                     }
@@ -349,8 +355,6 @@ var Solaria = (function () {
                 }
             }
         }
-        //callback
-        callback();
     };
 
     //...................
@@ -363,16 +367,18 @@ var Solaria = (function () {
     */
     solaria.loadLevel = function (n) {
         currentLevel = n;
-        for (var j in engine.body) {
+        for (var j in objects) {
             objects[j].execute_event("#exit", []);
         }
-        setEngineVar("currentlevel", n);
+        solaria.setEngineVar("#currentlevel", n);
         solaria.pause();
-        solaria.loader.show();
+        if (solaria.loader) {
+            solaria.loader.show();
+        }
         deleteSprites();
         //Just in case?
         animationEngine.clear();
-        objects = loadLevelObjects(engine.levels[n]).objects;
+        objects = loadLevelObjects(levels[n]).objects;
         assignSprites();
         solaria.setup();
     };
@@ -382,9 +388,9 @@ var Solaria = (function () {
  * @param {String} name - The level id
  */
     solaria.loadLevelByID = function (name) {
-        for (var i = 0; i < engine.levelsnames.length; i++) {
-            if (name == engine.levelsnames[i]) {
-                engine.loadLevel(i);
+        for (var i = 0; i < levelsnames.length; i++) {
+            if (name == levelsnames[i]) {
+                solaria.loadLevel(i);
                 return;
             }
         }
@@ -421,12 +427,12 @@ var Solaria = (function () {
             } else {
                 object.isstatic = false;
             }
-            object.vars["_x"] = +thisobject.getAttributeNode("x").value;
-            object.vars["_y"] = +thisobject.getAttributeNode("y").value;
+            object.vars["#x"] = +thisobject.getAttributeNode("x").value;
+            object.vars["#y"] = +thisobject.getAttributeNode("y").value;
             if (thisobject.getAttributeNode("z") != undefined) {
-                object.vars["_z"] = +(thisobject.getAttributeNode("z").value);
+                object.vars["#z"] = +(thisobject.getAttributeNode("z").value);
             } else {
-                object.vars["_z"] = 0;
+                object.vars["#z"] = 0;
             }
             if (thisobject.getAttributeNode("vars")) {
                 addJSONparameters(object.vars, thisobject.getAttributeNode("vars").value);
@@ -449,10 +455,15 @@ var Solaria = (function () {
     function checkLoadQueue () {
         if (loading == 0 && started == true) {
             intervalholder = setInterval(loop, Math.round(1000 / fps));
-            solaria.loader.hide();
+            if (solaria.loader) {
+                solaria.loader.hide();
+            }
         }
     }
 
+    solaria.getObject = function (i) {
+        return objects[i];
+    }
     //...................
     //     Sprites
     //...................
@@ -462,7 +473,7 @@ var Solaria = (function () {
         for (var i = 0; i < objects.length; i++) {
             if (objects[i].sprite != undefined) {
                 if (objects[i].sprite != undefined) {
-                    objects[i].spriteholder = animEngine.addObject(objects[i].vars["_sprite"], undefined, objects[i].vars["_x"], objects[i].vars["_y"], objects[i].vars["_z"], objects[i].vars["_isstatic"], objects[i].vars["_doesnottimetravel"]);
+                    objects[i].spriteholder = animationEngine.addObject(objects[i].sprite, undefined, objects[i].vars["#x"], objects[i].vars["#y"], objects[i].vars["#z"], objects[i].isstatic, objects[i].doesnottimetravel);
                 }
             }
         }
@@ -494,9 +505,10 @@ var Solaria = (function () {
         //animation
         for (var i in objects) {
             if (objects[i].spriteholder != undefined) {
-                animationEngine.setX(objects[i].spriteholder, objects[i].vars["_x"]);
-                animationEngine.setY(objects[i].spriteholder, objects[i].vars["_y"]);
-                animationEngine.setZindex(objects[i].spriteholder, objects[i].vars["_z"]);
+                animationEngine.setX(objects[i].spriteholder, objects[i].vars["#x"]);
+                animationEngine.setY(objects[i].spriteholder, objects[i].vars["#y"]);
+                animationEngine.setZindex(objects[i].spriteholder, objects[i].vars["#z"]);
+                animationEngine.setState(objects[i].spriteholder, objects[i].vars["#state"]);
             }
         }
 
@@ -527,7 +539,7 @@ var Solaria = (function () {
         if(collisions.detect[shape1]==undefined){
             collisions.detect[shape1] = {};
         }
-        collisions.detect[shape1][shape2] = detctor;
+        collisions.detect[shape1][shape2] = detector;
     }
 
     solaria.registerCollision = function (collisionPackage) {
