@@ -510,15 +510,24 @@ var Solaria = (function () {
     //...........................
 
 
-    solaria.registerShape = function (shapename) {
+    function registerShape (shapename) {
         collisions.shapes.push(shapename);
     }
 
-    solaria.registerCollisionDetector = function (shape1, shape2, detector) {
+    function registerCollisionDetector(shape1, shape2, detector) {
         if(collisions.detect[shape1]==undefined){
             collisions.detect[shape1] = {};
         }
         collisions.detect[shape1][shape2] = detctor;
+    }
+
+    solaria.registerCollision = function (collisionPackage) {
+        for (var i = 0; i < collisionPackage.shapes.length; i++) {
+            registerShape(collisionPackage.shapes[i]);
+        }
+        for (i = 0; i < collisionPackage.detectors.length; i++) {
+            registerCollisionDetector(collisionPackage.detectors[i].shape1, collisionPackage.detectors[i].shape2, collisionPackage.detectors[i].detector);
+        }
     }
 
     function processCollisions() {
