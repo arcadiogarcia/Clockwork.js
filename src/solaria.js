@@ -53,9 +53,7 @@ var Solaria = (function () {
 *
 */
     solaria.setup = function () {
-        engine.event = [{ name: "setup" }];
-        engine.processEvents();
-        engine.event = [];
+        solaria.execute_event("#setup");
         engine.checkLoadQueue();
     }
 
@@ -325,7 +323,7 @@ var Solaria = (function () {
 
             if (typeof thispreset.collision != "undefined") {
                 for (var j = 0; j < collisions.shapes.length; j++) {
-                    var thistype = thispreset.collision["collision-" + collisions.shapes[j]];
+                    var thistype = thispreset.collision[collisions.shapes[j]];
                     presets.list[thispreset.name].collision[collisions.shapes[j]] = [];
                     for (var k = 0; k < thistype.length; k++) {
                         addPresetCollision(thispreset.name, collisions.shapes[j],thispreset.points[k]);
@@ -477,7 +475,7 @@ var Solaria = (function () {
             return;
         }
 
-        if (solaria.execute_event("loop") == "#exit") {
+        if (solaria.execute_event("#loop") == "#exit") {
             return;
         }
 
