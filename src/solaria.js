@@ -25,6 +25,10 @@ var Solaria = (function () {
     //Holds the setInterval return value
     var intervalholder;
 
+    var collisions = {};
+    collisions.shapes = [];
+    collisions.detect = {};
+
     //A reference to the loader
     solaria.loader;
 
@@ -49,9 +53,7 @@ var Solaria = (function () {
 *
 */
     solaria.setup = function () {
-        engine.event = [{ name: "setup" }];
-        engine.processEvents();
-        engine.event = [];
+        solaria.execute_event("#setup");
         engine.checkLoadQueue();
     }
 
@@ -239,8 +241,7 @@ var Solaria = (function () {
             eventfunction: {},
             vars: {},
             name:name,
-            boundingbox: [],
-            collisionpoint: [],
+            collision: [],
             setVar: function (variable, value) {
                 this.vars[variable] = value;
             },
@@ -270,8 +271,7 @@ var Solaria = (function () {
         presets.list[name] = inheritObject(presets.list[parent]);
         presets.list[name].vars = inheritObject(presets.list[parent].vars);
         presets.list[name].eventfunction = inheritObject(engine_presets.list[parent].eventfunction);
-        presets.list[name].boundingbox = inheritObject(engine_presets.list[parent].boundingbox);
-        presets.list[name].collisionpoint = inheritObject(engine_presets.list[parent].collisionpoint);
+        presets.list[name].collision = inheritObject(engine_presets.list[parent].collision);
     }
 
 
@@ -297,12 +297,8 @@ var Solaria = (function () {
         presets.list[name].sprite = sprite;
     };
 
-    function addPresetPoint(name, x, y) {
-        presets.list[name].collisionpoint.push({ x: x, y: y });
-    };
-
-    function addPresetBox(name, x, y, w, h) {
-        presets.list[name].boundingbox.push({ x: x, y: y, w: w, h: h });
+    function addPresetCollision(name, type, object) {
+        presets.list[name].collision[type].push(object);
     };
 
     function implementPreset(name, type) {
@@ -336,17 +332,16 @@ var Solaria = (function () {
                 }
             }
 
-            if (typeof thispreset.points != "undefined") {
-                for (var j = 0; j < thispreset.points.length; j++) {
-                    addPresetPoint(thispreset.name, thispreset.points[j].x, thispreset.points[j].y);
+            if (typeof thispreset.collision != "undefined") {
+                for (var j = 0; j < collisions.shapes.length; j++) {
+                    var thistype = thispreset.collision[collisions.shapes[j]];
+                    presets.list[thispreset.name].collision[collisions.shapes[j]] = [];
+                    for (var k = 0; k < thistype.length; k++) {
+                        addPresetCollision(thispreset.name, collisions.shapes[j],thispreset.points[k]);
+                    }
                 }
             }
 
-            if (typeof thispreset.boxes != "undefined") {
-                for (var j = 0; j < thispreset.boxes.length; j++) {
-                    addPresetBox(thispreset.name, thispreset.boxes[j].x, thispreset.boxes[j].y, thispreset.boxes[j].w, thispreset.boxes[j].h);
-                }
-            }
 
             if (typeof thispreset.events != "undefined") {
                 for (var j = 0; j < thispreset.events.length; j++) {
@@ -369,7 +364,7 @@ var Solaria = (function () {
     solaria.loadLevel = function (n) {
         currentLevel = n;
         for (var j in engine.body) {
-            objects[j].execute_event("_exit", []);
+            objects[j].execute_event("#exit", []);
         }
         setEngineVar("currentlevel", n);
         solaria.pause();
@@ -487,32 +482,11 @@ var Solaria = (function () {
 
     function loop() {
 
-        //Collisions
-        for (var i = 0; i < objects.length; i++) {
-            for (var j = 0; j < objects.length; j++) {
-                if (i != j) {
-                    var b1 = objects[i];
-                    var b2 = objects[j];
-                    for (var k = 0; k < b1.boundingbox.length; k++) {
-
-                        for (var l = 0; l < b2.collisionpoint.length; l++) {
-                            var box = { x: b1.boundingbox[k].x + b1.vars["_x"], y: b1.boundingbox[k].y + b1.vars["_y"], w: b1.boundingbox[k].w, h: b1.boundingbox[k].h };
-                            var point = { x: b2.collisionpoint[l].x + b2.vars["_x"], y: b2.collisionpoint[l].y + b2.vars["_y"] };
-                            if (isPinsideB(point, box) == true) {
-                                if (b1.execute_event("collideB", { object: j, box: k, point: l }) == "exit") {
-                                    return;
-                                }
-                                if (b2.execute_event("collideP", { object: i, box: k, point: l }) == "exit") {
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        if (processCollisions() == "#exit") {
+            return;
         }
 
-        if (solaria.execute_event("loop") == "exit") {
+        if (solaria.execute_event("#loop") == "#exit") {
             return;
         }
 
@@ -533,11 +507,70 @@ var Solaria = (function () {
     solaria.execute_event = function (name, e_args) {
         for (var i in objects) {
             var body = objects[i];
-            if (body.execute_event(name, e_args) == "exit") {
-                return "exit";
+            if (body.execute_event(name, e_args) == "#exit") {
+                return "#exit";
             }
         }
 
+    }
+
+    //..........................
+    //     Colisions
+    //...........................
+
+
+    function registerShape (shapename) {
+        collisions.shapes.push(shapename);
+    }
+
+    function registerCollisionDetector(shape1, shape2, detector) {
+        if(collisions.detect[shape1]==undefined){
+            collisions.detect[shape1] = {};
+        }
+        collisions.detect[shape1][shape2] = detctor;
+    }
+
+    solaria.registerCollision = function (collisionPackage) {
+        for (var i = 0; i < collisionPackage.shapes.length; i++) {
+            registerShape(collisionPackage.shapes[i]);
+        }
+        for (i = 0; i < collisionPackage.detectors.length; i++) {
+            registerCollisionDetector(collisionPackage.detectors[i].shape1, collisionPackage.detectors[i].shape2, collisionPackage.detectors[i].detector);
+        }
+    }
+
+    function processCollisions() {
+        //For every pair of (different) objects
+        for (var i = 0; i < objects.length; i++) {
+            for (var j = 0; j < objects.length; j++) {
+                if (i != j) {
+                    var b1 = objects[i];
+                    var b2 = objects[j];
+                    //For every kind of shape for each object
+                    for (var type1 = 0; type1 < collisions.shapes.length; type1++) {
+                        for (var type2 = 0; type2 < collisions.shapes.length; type2++) {
+                            var shape1 = collisions.shapes[type1];
+                            var shape2 = collisions.shapes[type2];
+                            //For every shape of that kind in this object
+                            for (var k = 0; k < b1.collision[shape1].length; k++) {
+                                for (var l = 0; l < b2.collision[shape2].length; l++) {
+                                    //Check if they collide
+                                    if (collisions.detect[shape1][shape2](b1.collision[shape1][k], b2.collision[shape2][l]) == true) {
+                                        //Send the info to the #collide event handlers
+                                        if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind:shape2, shape1id:k, shape2id:l }) == "#exit") {
+                                            return "#exit";
+                                        }
+                                        if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k }) == "#exit") {
+                                            return "#exit";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     return solaria;
