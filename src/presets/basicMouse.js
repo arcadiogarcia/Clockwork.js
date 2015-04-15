@@ -6,14 +6,14 @@ var basicClickPreset = [
     events: [
         {
             name: "#setup", code: function (event) {
-                this.setVar("listener_click", window.addEventListener("click", (function (that) { return that.execute_event.curry("onclick") })(this), true));
-                this.setVar("listener_move", window.addEventListener("move", (function (that) { return that.execute_event.curry("onmove") })(this), true));
+                this.setVar("listener_click", window.addEventListener("click", (function (that) { return that.execute_event.curryThis(that,"onclick") })(this), true));
+                this.setVar("listener_move", window.addEventListener("mousemove", (function (that) { return that.execute_event.curryThis(that,"onmove") })(this), true));
             }
         },
         {
             name: "#exit", code: function (event) {
                 window.removeEventListener("click", this.getVar("listener_click"));
-                window.removeEventListener("move", this.getVar("listener_move"));
+                window.removeEventListener("mousemove", this.getVar("listener_move"));
             }
         },
         {
@@ -50,7 +50,7 @@ var basicClickPreset = [
              }
          }
     ],
-    collisions: {
+    collision: {
         "point": [
             //Coordinates of the pointer
             { "x": 0, "y": 0 },

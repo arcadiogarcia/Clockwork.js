@@ -7,20 +7,38 @@ var dog = [
     events: [
         {
             name: "#setup", code: function (event) {
-                this.setVar("_state", "Idle");
+                this.setVar("#state", "Idle");
+				this.setVar("timer", 0);
             }
         },
         {
-            name: "collide", code: function (event) {
-                if (shape2kind == "point" && shape2id == 1 && solaria.getObject(object).instanceOf("basicMouse")) {
-                    this.setVar("_state", "Bark");
+            name: "#collide", code: function (event) {
+                if (event.shape2kind == "point" && this.engine.getObject(event.object).instanceOf("basicMouse")) {
+					if(event.shape2id == 1){
+						this.setVar("#state", "Bark");
+						this.setVar("timer", 14);
+					}
+					if(event.shape2id == 0 && this.getVar("timer")==0){
+						this.setVar("#state", "SeeUL");
+						this.setVar("timer", 14);
+					}
+                }
+            }
+        },
+		{
+            name: "#loop", code: function (event) {
+                if (this.getVar("timer")>0) {
+					this.setVar("timer", this.getVar("timer")-1);
+					if (this.getVar("timer")==0) {
+                    	this.setVar("#state", "Idle");
+					}
                 }
             }
         }
     ],
-    collisions: {
+    collision: {
         "box": [
-            { "x": 120, "y": 60 },
+            { "x": 0, "y": 0, "w": 120, "h": 120 },
         ]
     }
 }

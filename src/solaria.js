@@ -1,4 +1,4 @@
-﻿//Solaria engine
+//Solaria engine
 //Arcadio Garcia Salvadores
 
 var Solaria = (function () {
@@ -38,6 +38,8 @@ var Solaria = (function () {
     //It will be used for input detection
     var DOMholder;
 
+    var debugMode = 1;
+
 
     //...................................
     //   Engine control
@@ -52,7 +54,7 @@ var Solaria = (function () {
         fps = newfps;
         started = true;
         solaria.loadLevel(0);
-        DOMholder=DOMelement;
+        DOMholder = DOMelement;
     }
 
     /**
@@ -138,6 +140,14 @@ var Solaria = (function () {
         };
     });
 
+    Function.method('curryThis', function () {
+        var slice = Array.prototype.slice, args = slice.apply(arguments), that = this;
+        var caller = args.splice(0, 1)[0];
+        return function () {
+            return that.apply(caller, args.concat(slice.apply(arguments)));
+        };
+    });
+
     function searchWhere(array, key, value) {
         for (var i = 0; i < array.length; i++) {
             if (array[i][key] == value) {
@@ -206,6 +216,10 @@ var Solaria = (function () {
 
     }
 
+    function cloneObject(o) {
+        return JSON.parse(JSON.stringify(o));
+    }
+
     //....................
     //     Logger
     //....................
@@ -217,7 +231,7 @@ var Solaria = (function () {
      * @param {Number} level - The priority level of the message (1 is error, 2 is warning) (see {@link setDebugMode})
      */
     function debugLog(text, level) {
-        if ((level || 2) <= enginePrivate.debugMode) {
+        if ((level || 2) <= debugMode) {
             console.log(text);
         }
     }
@@ -231,7 +245,7 @@ var Solaria = (function () {
      * The default mode is 2
      */
     solaria.setDebugMode = function (level) {
-        enginePrivate.debugMode = level;
+        debugMode = level;
     }
 
 
@@ -247,7 +261,8 @@ var Solaria = (function () {
         presets[name] = {
             eventfunction: {},
             vars: {},
-            name:name,
+            name: name,
+            engine:solaria,
             collision: [],
             setVar: function (variable, value) {
                 this.vars[variable] = value;
@@ -263,7 +278,7 @@ var Solaria = (function () {
                 }
             },
             instanceOf: function (name) {
-                if(this.name==name){
+                if (this.name == name) {
                     return true;
                 }
                 if (typeof this.prototype.instanceOf != "undefined") {
@@ -311,7 +326,7 @@ var Solaria = (function () {
     function implementPreset(name, type) {
         var newone = inheritObject(presets[type]);
         newone.vars["name"] = name;
-        newone.spriteholder = -1;
+        newone.spriteholder = undefined;
         return newone;
     };
 
@@ -320,9 +335,9 @@ var Solaria = (function () {
      *Loads the presets from a JavaScript object
      * @param {Object} presets - The object holding the presets
      */
-    solaria.loadPresets = function (presets) {
-        for (var i = 0; i < presets.length; i++) {
-            var thispreset = presets[i];
+    solaria.loadPresets = function (newpresets) {
+        for (var i = 0; i < newpresets.length; i++) {
+            var thispreset = newpresets[i];
 
             if (thispreset.inherits != undefined) {
                 inheritPreset(thispreset.name, thispreset.inherits);
@@ -341,9 +356,11 @@ var Solaria = (function () {
             if (typeof thispreset.collision != "undefined") {
                 for (var j = 0; j < collisions.shapes.length; j++) {
                     var thistype = thispreset.collision[collisions.shapes[j]];
-                    presets[thispreset.name].collision[collisions.shapes[j]] = [];
-                    for (var k = 0; k < thistype.length; k++) {
-                        addPresetCollision(thispreset.name, collisions.shapes[j],thispreset.points[k]);
+                    if (thistype != undefined) {
+                        presets[thispreset.name].collision[collisions.shapes[j]] = [];
+                        for (var k = 0; k < thistype.length; k++) {
+                            addPresetCollision(thispreset.name, collisions.shapes[j], thistype[k]);
+                        }
                     }
                 }
             }
@@ -445,14 +462,14 @@ var Solaria = (function () {
     //It starts as 0, and it is incremented (wait) for each resource that must be loaded
     //Then it is increased for each loaded resource (signal), and if it is 0 again the engine continues
     //This avoids to start beofre every asset is loaded
-    function addLoadQueue  () {
+    function addLoadQueue() {
         loading++;
     };
-    function removeLoadQueue () {
+    function removeLoadQueue() {
         loading--;
         checkLoadQueue();
     };
-    function checkLoadQueue () {
+    function checkLoadQueue() {
         if (loading == 0 && started == true) {
             intervalholder = setInterval(loop, Math.round(1000 / fps));
             if (solaria.loader) {
@@ -531,12 +548,12 @@ var Solaria = (function () {
     //...........................
 
 
-    function registerShape (shapename) {
+    function registerShape(shapename) {
         collisions.shapes.push(shapename);
     }
 
     function registerCollisionDetector(shape1, shape2, detector) {
-        if(collisions.detect[shape1]==undefined){
+        if (collisions.detect[shape1] == undefined) {
             collisions.detect[shape1] = {};
         }
         collisions.detect[shape1][shape2] = detector;
@@ -563,18 +580,30 @@ var Solaria = (function () {
                         for (var type2 = 0; type2 < collisions.shapes.length; type2++) {
                             var shape1 = collisions.shapes[type1];
                             var shape2 = collisions.shapes[type2];
-                            //For every shape of that kind in this object
-                            for (var k = 0; k < b1.collision[shape1].length; k++) {
-                                for (var l = 0; l < b2.collision[shape2].length; l++) {
-                                    //Check if they collide
-                                    if (collisions.detect[shape1][shape2](b1.collision[shape1][k], b2.collision[shape2][l]) == true) {
-                                        //Send the info to the #collide event handlers
-                                        if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind:shape2, shape1id:k, shape2id:l }) == "#exit") {
-                                            return "#exit";
+                            if (b1.collision[shape1] != undefined && b2.collision[shape2] != undefined) {
+                                //For every shape of that kind in this object
+                                for (var k = 0; k < b1.collision[shape1].length; k++) {
+                                    for (var l = 0; l < b2.collision[shape2].length; l++) {
+                                        var bodyShape1=b1.collision[shape1][k];
+                                        var bodyShape2 = b2.collision[shape2][l];
+                                        bodyShape1.x += b1.getVar("#x");
+                                        bodyShape1.y += b1.getVar("#y");
+                                        bodyShape2.x += b2.getVar("#x");
+                                        bodyShape2.y += b2.getVar("#y");
+                                        //Check if they collide
+                                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1,bodyShape2 ) == true) {
+                                            //Send the info to the #collide event handlers
+                                            if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l }) == "#exit") {
+                                                return "#exit";
+                                            }
+                                            if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k }) == "#exit") {
+                                                return "#exit";
+                                            }
                                         }
-                                        if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k }) == "#exit") {
-                                            return "#exit";
-                                        }
+                                        bodyShape1.x -= b1.getVar("#x");
+                                        bodyShape1.y -= b1.getVar("#y");
+                                        bodyShape2.x -= b2.getVar("#x");
+                                        bodyShape2.y -= b2.getVar("#y");
                                     }
                                 }
                             }
