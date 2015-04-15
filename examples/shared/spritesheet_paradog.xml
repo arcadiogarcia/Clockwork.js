@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<spritesheets>
+  <spritesheet name="paradog" src="../shared/paradog.png">
+
+    <states>
+      <state name="Idle">
+        <layer name="Idle1"></layer>
+      </state>
+      <state name="RunL">
+        <layer name="Run1"></layer>
+      </state>
+      <state name="RunR" flip="h">
+        <layer name="Run1"></layer>
+      </state>
+      <state name="SeeUL">
+        <layer name="SeeU1"></layer>
+      </state>
+      <state name="SeeUR" flip="h">
+        <layer name="SeeU1"></layer>
+      </state>
+      <state name="Bark">
+        <layer name="Bark1"></layer>
+      </state>
+      <state name="Scare">
+        <layer name="Scare1"></layer>
+      </state>
+    </states>
+
+    <layers>
+      <layer name="Idle1" x="0" y="0">
+        <frame name="I1"></frame>
+        <frame name="I2"></frame>
+        <frame name="I3"></frame>
+        <frame name="I4"></frame>
+        <frame name="I5"></frame>
+        <frame name="I6"></frame>
+      </layer>
+      <layer name="Run1" x="0" y="0">
+        <frame name="R1"></frame>
+        <frame name="R2"></frame>
+        <frame name="R3"></frame>
+        <frame name="R4"></frame>
+        <frame name="R5"></frame>
+        <frame name="R6"></frame>
+      </layer>
+      <layer name="SeeU1" x="0" y="0">
+        <frame name="S1"></frame>
+        <frame name="S2"></frame>
+        <frame name="S3"></frame>
+      </layer>
+      <layer name="Bark1" x="0" y="0">
+        <frame name="B1"></frame>
+        <frame name="B2"></frame>
+        <frame name="B3"></frame>
+        <frame name="B4"></frame>
+      </layer>
+      <layer name="Scare1" x="0" y="0">
+        <frame name="O1"></frame>
+        <frame name="O2"></frame>
+        <frame name="O3"></frame>
+        <frame name="O4"></frame>
+        <frame name="O5"></frame>
+      </layer>
+    </layers>
+
+    <frames>
+      <frame name="I1" x="0" y="0" w="117" h="118" t="100"></frame>
+      <frame name="I2" x="117" y="0" w="117" h="118" t="100"></frame>
+      <frame name="I3" x="234" y="0" w="117" h="118" t="100"></frame>
+      <frame name="I4" x="351" y="0" w="117" h="118" t="100"></frame>
+      <frame name="I5" x="468" y="0" w="117" h="118" t="100"></frame>
+      <frame name="I6" x="585" y="0" w="117" h="118" t="100"></frame>
+
+      <frame name="R1" x="0" y="354" w="117" h="118" t="100"></frame>
+      <frame name="R2" x="117" y="354" w="117" h="118" t="100"></frame>
+      <frame name="R3" x="234" y="354" w="117" h="118" t="100"></frame>
+      <frame name="R4" x="351" y="354" w="117" h="118" t="100"></frame>
+      <frame name="R5" x="468" y="354" w="117" h="118" t="100"></frame>
+      <frame name="R6" x="585" y="354" w="117" h="118" t="100"></frame>
+
+      <frame name="S1" x="0" y="118" w="117" h="118" t="100"></frame>
+      <frame name="S2" x="117" y="118" w="117" h="118" t="500"></frame>
+      <frame name="S3" x="234" y="118" w="117" h="118" t="100"></frame>
+
+      <frame name="B1" x="0" y="472" w="117" h="118" t="100"></frame>
+      <frame name="B2" x="117" y="472" w="117" h="118" t="100"></frame>
+      <frame name="B3" x="234" y="472" w="117" h="118" t="100"></frame>
+      <frame name="B4" x="351" y="472" w="117" h="118" t="100"></frame>
+
+      <frame name="O1" x="0" y="236" w="117" h="118" t="100"></frame>
+      <frame name="O2" x="117" y="236" w="117" h="118" t="100"></frame>
+      <frame name="O3" x="234" y="236" w="117" h="118" t="100"></frame>
+      <frame name="O4" x="351" y="236" w="117" h="118" t="100"></frame>
+      <frame name="O5" x="468" y="236" w="117" h="118" t="100"></frame>
+
+    </frames>
+
+  </spritesheet>
+
+
+</spritesheets>
