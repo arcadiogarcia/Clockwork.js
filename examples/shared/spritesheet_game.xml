@@ -72,6 +72,26 @@
 
   </spritesheet>
 
+  <spritesheet name="score" >
+
+    <states>
+      <state name="normal">
+        <layer name="Idle1"></layer>
+      </state>
+    </states>
+
+    <layers>
+      <layer name="Idle1" x="0" y="0">
+        <frame name="Text"></frame>
+      </layer>
+    </layers>
+
+    <frames>
+      <frame name="Text" code="context.textBaseline ='top';context.textAlign='start';context.font='20pt Verdana';context.fillStyle = '#F00';context.fillText(vars['$points'],x,y);" t="0"></frame>
+    </frames>
+
+  </spritesheet>
+
   <spritesheet name="paradog" src="../shared/paradog_small.png">
 
     <states>
