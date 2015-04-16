@@ -3,7 +3,10 @@
   <spritesheet name="paradog" src="../shared/paradog.png">
 
     <states>
-      <state name="Idle">
+      <state name="IdleL">
+        <layer name="Idle1"></layer>
+      </state>
+      <state name="IdleR" flip="h">
         <layer name="Idle1"></layer>
       </state>
       <state name="RunL">
@@ -18,7 +21,10 @@
       <state name="SeeUR" flip="h">
         <layer name="SeeU1"></layer>
       </state>
-      <state name="Bark">
+      <state name="BarkL">
+        <layer name="Bark1"></layer>
+      </state>
+      <state name="BarkR" flip="h">
         <layer name="Bark1"></layer>
       </state>
       <state name="Scare">

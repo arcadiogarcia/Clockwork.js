@@ -7,7 +7,7 @@ var dog = [
     events: [
         {
             name: "#setup", code: function (event) {
-                this.setVar("#state", "Idle");
+                this.setVar("#state", "IdleL");
 				this.setVar("timer", 0);
             }
         },
@@ -15,7 +15,7 @@ var dog = [
             name: "#collide", code: function (event) {
                 if (event.shape2kind == "point" && this.engine.getObject(event.object).instanceOf("basicMouse")) {
 					if(event.shape2id == 1){
-						this.setVar("#state", "Bark");
+						this.setVar("#state", "BarkL");
 						this.setVar("timer", 14);
 					}
 					if(event.shape2id == 0 && this.getVar("timer")==0){
@@ -30,7 +30,7 @@ var dog = [
                 if (this.getVar("timer")>0) {
 					this.setVar("timer", this.getVar("timer")-1);
 					if (this.getVar("timer")==0) {
-                    	this.setVar("#state", "Idle");
+                    	this.setVar("#state", "IdleL");
 					}
                 }
             }

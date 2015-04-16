@@ -281,7 +281,7 @@ var Solaria = (function () {
                 if (this.name == name) {
                     return true;
                 }
-                if (typeof this.prototype.instanceOf != "undefined") {
+                if (this.prototype != undefined && this.prototype.instanceOf != undefined) {
                     return this.prototype.instanceOf(name);
                 }
                 return false;
@@ -344,7 +344,9 @@ var Solaria = (function () {
             } else {
                 createPreset(thispreset.name);
             }
-            setPresetSprite(thispreset.name, thispreset.sprite);
+            if (thispreset.sprite != undefined) {
+                setPresetSprite(thispreset.name, thispreset.sprite);
+            }
 
 
             if (typeof thispreset.vars != "undefined") {
@@ -405,8 +407,8 @@ var Solaria = (function () {
  * @param {String} name - The level id
  */
     solaria.loadLevelByID = function (name) {
-        for (var i = 0; i < levelsnames.length; i++) {
-            if (name == levelsnames[i]) {
+        for (var i = 0; i < levelsNames.length; i++) {
+            if (name == levelsNames[i]) {
                 solaria.loadLevel(i);
                 return;
             }
