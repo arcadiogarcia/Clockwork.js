@@ -72,7 +72,7 @@
 
   </spritesheet>
 
-  <spritesheet name="score" >
+  <spritesheet name="text" >
 
     <states>
       <state name="normal">
@@ -87,7 +87,7 @@
     </layers>
 
     <frames>
-      <frame name="Text" code="context.textBaseline ='top';context.textAlign='start';context.font='20pt Verdana';context.fillStyle = '#F00';context.fillText(vars['$points'],x,y);" t="0"></frame>
+      <frame name="Text" code="context.textBaseline ='top';context.textAlign='start';context.font='20pt Verdana';context.fillStyle = vars['$color'];context.fillText(vars['$text'],x,y);" t="0"></frame>
     </frames>
 
   </spritesheet>

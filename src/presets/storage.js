@@ -6,7 +6,7 @@ var storage = [
     events: [
         {
             name: "#setup", code: function (event) {
-                if (Windows != undefined) {
+                if (typeof Windows != "undefined") {
                     this.setVar("platform", "Windows");
                     var roamingSettings = Windows.Storage.ApplicationData.current.roamingSettings;
                     if (!roamingSettings.values["HighPriority"]) {
@@ -38,7 +38,7 @@ var storage = [
                      case "Windows":
                          return this.getVar("storage").lookup(event.property);
                      default:
-                         return localStorage.getItem(event.propert);
+                         return localStorage.getItem(event.property);
                          break;
                  }
              }

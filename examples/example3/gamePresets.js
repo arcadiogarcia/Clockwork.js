@@ -33,7 +33,7 @@ var gamePresets = [
 		            this.setVar("#x", this.getVar("#x") + 5);
 		        }
 		        if (this.getVar("alive") == true) {
-		            if (this.getVar("#y") < 0 && this.getVar("#y") > 400) {
+		            if (this.getVar("#y") < 0 || this.getVar("#y") > 400) {
 		                this.engine.execute_event("gameover");
 		            }
 		            if (this.getVar("timer") > 0) {
@@ -187,18 +187,37 @@ var gamePresets = [
 },
 {
     name: "score",
-    sprite: "score",
+    sprite: "text",
     events: [
        {
            name: "#setup", code: function (event) {
-               this.setVar("$points",0);
+               this.setVar("points", 0);
+               this.setVar("$text", "Score: " + this.getVar("points"));
+               this.setVar("$color", "#F00");
            }
        },
         {
             name: "addpoints", code: function (event) {
-                this.setVar("$points",this.getVar("$points")+event.points);
+                this.setVar("points", this.getVar("points") + event.points);
+                this.setVar("$text", "Score: " + this.getVar("points"));
+                if (this.getVar("points") >= +(this.engine.find("mystorage").execute_event("getStorage", { "property": "maxscore" }) || 0)) {
+                    this.engine.find("mystorage").execute_event("putStorage", { "property": "maxscore", "value": this.getVar("points") });
+                    this.setVar("$color", "#0F0");
+                }
             }
         }
+    ]
+},
+{
+    name: "maxscore",
+    sprite: "text",
+    events: [
+       {
+           name: "#setup", code: function (event) {
+               this.setVar("$text", "High score: " + (this.engine.find("mystorage").execute_event("getStorage", { "property": "maxscore" }) || 0));
+               this.setVar("$color", "#FF0");
+           }
+       }
     ]
 }
 ];

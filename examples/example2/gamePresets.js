@@ -33,7 +33,7 @@ var gamePresets = [
 		            this.setVar("#x", this.getVar("#x") + 5);
 		        }
 		        if (this.getVar("alive") == true) {
-		            if (this.getVar("#y") < 0 && this.getVar("#y") > 400) {
+		            if (this.getVar("#y") < 0 || this.getVar("#y") > 400) {
 		                this.engine.execute_event("gameover");
 		            }
 		            if (this.getVar("timer") > 0) {

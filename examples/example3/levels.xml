@@ -11,6 +11,8 @@
     <object name="somePipe2" type="pipe_reverse" x="200" y="-165" ></object>
     <object name="someDog" type="dog" x="0" y="100" ></object>
     <object name="someMouse" type="basicMouse" x="0" y="0" ></object>
-    <object name="someScore" type="score" x="740" y="50" ></object>
+    <object name="someScore" type="score" x="600" y="50" ></object>
+    <object name="maxScore" type="maxscore" x="600" y="100" ></object>
+    <object name="mystorage" type="storage" x="0" y="0" ></object>
   </level>
 </levels>

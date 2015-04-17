@@ -98,9 +98,16 @@ var Solaria = (function () {
 *@param {Object} variable - The object handler
 */
     solaria.getObject = function (variable) {
-        return engine.body[variable];
+        return objects[variable];
     }
 
+    /**
+*Gets an object
+*@param {Object} variable - The object name
+*/
+    solaria.find = function (variable) {
+        return searchWhereDeep(objects, ["vars","name"], variable);
+    }
 
     /**
 *Sets the animation engine
@@ -151,6 +158,19 @@ var Solaria = (function () {
     function searchWhere(array, key, value) {
         for (var i = 0; i < array.length; i++) {
             if (array[i][key] == value) {
+                return array[i];
+            }
+        }
+        return null;
+    }
+
+    function searchWhereDeep(array, keys, value) {
+        for (var i = 0; i < array.length; i++) {
+            var object=array[i];
+            for (var j = 0; j < keys.length; j++) {
+                object = object[keys[j]];
+            }
+            if (object == value) {
                 return array[i];
             }
         }
