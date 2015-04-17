@@ -1,4 +1,4 @@
-// Default loader for solaria engine
+// Default loader for the clockwork engine
 //Arcadio Garcia Salvadores
 
 

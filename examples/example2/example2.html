@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title></title>
     <script src="gamePresets.js"></script>
-    <script src="../../src/Solaria.js"></script>
+    <script src="../../src/Clockwork.js"></script>
     <script src="../../src/collisions/pointsAndBoxes.js"></script>
     <script src="../../src/presets/basicMouse.js"></script>
     <script src="../shared/spritesheet.js"></script>
@@ -25,10 +25,10 @@
 
         //This function is executed after Spritesheet.js loads
         function callback_load() {
-            //This is where Solaria.js starts
-            var engineInstance = new Solaria();
+            //This is where Clockwork.js starts
+            var engineInstance = new Clockwork();
             engineInstance.setAnimationEngine(canvasAnimation);
-            engineInstance.registerCollision(SolariaCollisions.pointsAndBoxes);
+            engineInstance.registerCollision(ClockworkCollisions.pointsAndBoxes);
             engineInstance.loadPresets(basicClickPreset);
             engineInstance.loadPresets(gamePresets);
             engineInstance.loadLevelsFromXML("levels.xml", function () {

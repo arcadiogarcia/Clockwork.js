@@ -1,9 +1,9 @@
-// Basic collisions for the Solaria engine
+// Basic collisions for the Clockwork engine
 // Arcadio Garcia Salvadores
 
-var SolariaCollisions = SolariaCollisions || {};
+var ClockworkCollisions = ClockworkCollisions || {};
 
-SolariaCollisions.pointsAndBoxes = {
+ClockworkCollisions.pointsAndBoxes = {
     shapes:["point","box"],
     detectors: [
         {

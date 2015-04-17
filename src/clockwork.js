@@ -1,9 +1,9 @@
-//Solaria engine
+//Clockwork engine
 //Arcadio Garcia Salvadores
 
-var Solaria = (function () {
+var Clockwork = (function () {
     //This object stores the public functions
-    var solaria = {};
+    var clockwork = {};
     //The list of presets loaded
     var presets = {};
     //The objects in the current level
@@ -32,7 +32,7 @@ var Solaria = (function () {
     collisions.detect = {};
 
     //A reference to the loader
-    solaria.loader;
+    clockwork.loader;
 
     //The DOM element that "holds" the engine
     //It will be used for input detection
@@ -50,10 +50,10 @@ var Solaria = (function () {
    *Starts the engine and loads the firt level
    * @param {Number} fps - The frames per second 
    */
-    solaria.start = function (newfps, DOMelement) {
+    clockwork.start = function (newfps, DOMelement) {
         fps = newfps;
         started = true;
-        solaria.loadLevel(0);
+        clockwork.loadLevel(0);
         DOMholder = DOMelement;
     }
 
@@ -61,8 +61,8 @@ var Solaria = (function () {
 *Starts (or restarts) the engine execution with the data loaded
 *
 */
-    solaria.setup = function () {
-        solaria.execute_event("#setup");
+    clockwork.setup = function () {
+        clockwork.execute_event("#setup");
         checkLoadQueue();
     }
 
@@ -70,7 +70,7 @@ var Solaria = (function () {
   *Pauses the execution of the engine
   *
   */
-    solaria.pause = function () {
+    clockwork.pause = function () {
         clearInterval(intervalholder);
     }
 
@@ -78,7 +78,7 @@ var Solaria = (function () {
    *Gets the value of a global variable
    * @param {String} variable - The name of the variable
    */
-    solaria.getEngineVar = function (variable) {
+    clockwork.getEngineVar = function (variable) {
         return globalvars[variable];
     }
 
@@ -88,7 +88,7 @@ var Solaria = (function () {
  @param {String} variable - The name of the variable
  * @param {Object} value - The value of the variable
  */
-    solaria.setEngineVar = function (variable, value) {
+    clockwork.setEngineVar = function (variable, value) {
         globalvars[variable] = value;
     }
 
@@ -97,7 +97,7 @@ var Solaria = (function () {
 *Gets an object
 *@param {Object} variable - The object handler
 */
-    solaria.getObject = function (variable) {
+    clockwork.getObject = function (variable) {
         return objects[variable];
     }
 
@@ -105,7 +105,7 @@ var Solaria = (function () {
 *Gets an object
 *@param {Object} variable - The object name
 */
-    solaria.find = function (variable) {
+    clockwork.find = function (variable) {
         return searchWhereDeep(objects, ["vars","name"], variable);
     }
 
@@ -113,7 +113,7 @@ var Solaria = (function () {
 *Sets the animation engine
 *@param {Object} engine - The animation engine
 */
-    solaria.setAnimationEngine = function (engine) {
+    clockwork.setAnimationEngine = function (engine) {
         animationEngine = engine;
     }
 
@@ -264,7 +264,7 @@ var Solaria = (function () {
      * When mode is set to 2, both errors and alerts will be shown in the console
      * The default mode is 2
      */
-    solaria.setDebugMode = function (level) {
+    clockwork.setDebugMode = function (level) {
         debugMode = level;
     }
 
@@ -282,7 +282,7 @@ var Solaria = (function () {
             eventfunction: {},
             vars: {},
             name: name,
-            engine: solaria,
+            engine: clockwork,
             collision: [],
             setVar: function (variable, value) {
                 if (this.spriteholder != undefined) {
@@ -376,7 +376,7 @@ var Solaria = (function () {
      *Loads the presets from a JavaScript object
      * @param {Object} presets - The object holding the presets
      */
-    solaria.loadPresets = function (newpresets) {
+    clockwork.loadPresets = function (newpresets) {
         for (var i = 0; i < newpresets.length; i++) {
             var thispreset = newpresets[i];
 
@@ -425,32 +425,32 @@ var Solaria = (function () {
     * Loads a level
     * @param {Number} n - The level number
     */
-    solaria.loadLevel = function (n) {
+    clockwork.loadLevel = function (n) {
         currentLevel = n;
         for (var j in objects) {
             objects[j].execute_event("#exit", []);
         }
-        solaria.setEngineVar("#currentlevel", n);
-        solaria.pause();
-        if (solaria.loader) {
-            solaria.loader.show();
+        clockwork.setEngineVar("#currentlevel", n);
+        clockwork.pause();
+        if (clockwork.loader) {
+            clockwork.loader.show();
         }
         deleteSprites();
         //Just in case?
         animationEngine.clear();
         objects = loadLevelObjects(levels[n]).objects;
         assignSprites();
-        solaria.setup();
+        clockwork.setup();
     };
 
     /**
  * Loads a level
  * @param {String} name - The level id
  */
-    solaria.loadLevelByID = function (name) {
+    clockwork.loadLevelByID = function (name) {
         for (var i = 0; i < levelsNames.length; i++) {
             if (name == levelsNames[i]) {
-                solaria.loadLevel(i);
+                clockwork.loadLevel(i);
                 return;
             }
         }
@@ -463,7 +463,7 @@ var Solaria = (function () {
   * @param {Function} callback - A callback function
  */
 
-    solaria.loadLevelsFromXML = function (url, callback) {
+    clockwork.loadLevelsFromXML = function (url, callback) {
         loadXMLFile(url, function (xmlDoc) {
             for (var i = 0; i < xmlDoc.getElementsByTagName("level").length; i++) {
                 levels.push(xmlDoc.getElementsByTagName("level")[i]);
@@ -515,13 +515,13 @@ var Solaria = (function () {
     function checkLoadQueue() {
         if (loading == 0 && started == true) {
             intervalholder = setInterval(loop, Math.round(1000 / fps));
-            if (solaria.loader) {
-                solaria.loader.hide();
+            if (clockwork.loader) {
+                clockwork.loader.hide();
             }
         }
     }
 
-    solaria.getObject = function (i) {
+    clockwork.getObject = function (i) {
         return objects[i];
     }
     //...................
@@ -557,7 +557,7 @@ var Solaria = (function () {
             return;
         }
 
-        if (solaria.execute_event("#loop") == "#exit") {
+        if (clockwork.execute_event("#loop") == "#exit") {
             return;
         }
 
@@ -568,7 +568,7 @@ var Solaria = (function () {
 
     }
 
-    solaria.execute_event = function (name, e_args) {
+    clockwork.execute_event = function (name, e_args) {
         for (var i in objects) {
             var body = objects[i];
             if (body.execute_event(name, e_args) == "#exit") {
@@ -594,7 +594,7 @@ var Solaria = (function () {
         collisions.detect[shape1][shape2] = detector;
     }
 
-    solaria.registerCollision = function (collisionPackage) {
+    clockwork.registerCollision = function (collisionPackage) {
         for (var i = 0; i < collisionPackage.shapes.length; i++) {
             registerShape(collisionPackage.shapes[i]);
         }
@@ -649,5 +649,5 @@ var Solaria = (function () {
         }
     }
 
-    return solaria;
+    return clockwork;
 });

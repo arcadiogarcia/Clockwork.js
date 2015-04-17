@@ -1,4 +1,4 @@
-// Preset for the Solaria engine
+// Preset for the Clockwork engine
 // Arcadio Garcia Salvadores
 var dog = [
 {
