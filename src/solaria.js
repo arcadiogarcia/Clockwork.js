@@ -98,9 +98,16 @@ var Solaria = (function () {
 *@param {Object} variable - The object handler
 */
     solaria.getObject = function (variable) {
-        return engine.body[variable];
+        return objects[variable];
     }
 
+    /**
+*Gets an object
+*@param {Object} variable - The object name
+*/
+    solaria.find = function (variable) {
+        return searchWhereDeep(objects, ["vars","name"], variable);
+    }
 
     /**
 *Sets the animation engine
@@ -151,6 +158,19 @@ var Solaria = (function () {
     function searchWhere(array, key, value) {
         for (var i = 0; i < array.length; i++) {
             if (array[i][key] == value) {
+                return array[i];
+            }
+        }
+        return null;
+    }
+
+    function searchWhereDeep(array, keys, value) {
+        for (var i = 0; i < array.length; i++) {
+            var object=array[i];
+            for (var j = 0; j < keys.length; j++) {
+                object = object[keys[j]];
+            }
+            if (object == value) {
                 return array[i];
             }
         }
@@ -262,9 +282,30 @@ var Solaria = (function () {
             eventfunction: {},
             vars: {},
             name: name,
-            engine:solaria,
+            engine: solaria,
             collision: [],
             setVar: function (variable, value) {
+                if (this.spriteholder != undefined) {
+                    switch (variable) {
+                        case "#x":
+                            animationEngine.setX(this.spriteholder, value);
+                            break;
+                        case "#y":
+                            animationEngine.setY(this.spriteholder, value);
+                            break;
+                        case "#z":
+                            animationEngine.setZindex(this.spriteholder, value);
+                            break;
+                        case "#state":
+                            animationEngine.setState(this.spriteholder, value);
+                            break;
+                        default:
+                            if (variable[0] == "$") {
+                                animationEngine.setParameter(this.spriteholder, variable, value);
+                            }
+                            break;
+                    }
+                }
                 this.vars[variable] = value;
             },
             getVar: function (variable) {
@@ -281,7 +322,7 @@ var Solaria = (function () {
                 if (this.name == name) {
                     return true;
                 }
-                if (typeof this.prototype.instanceOf != "undefined") {
+                if (this.prototype != undefined && this.prototype.instanceOf != undefined) {
                     return this.prototype.instanceOf(name);
                 }
                 return false;
@@ -344,7 +385,9 @@ var Solaria = (function () {
             } else {
                 createPreset(thispreset.name);
             }
-            setPresetSprite(thispreset.name, thispreset.sprite);
+            if (thispreset.sprite != undefined) {
+                setPresetSprite(thispreset.name, thispreset.sprite);
+            }
 
 
             if (typeof thispreset.vars != "undefined") {
@@ -405,8 +448,8 @@ var Solaria = (function () {
  * @param {String} name - The level id
  */
     solaria.loadLevelByID = function (name) {
-        for (var i = 0; i < levelsnames.length; i++) {
-            if (name == levelsnames[i]) {
+        for (var i = 0; i < levelsNames.length; i++) {
+            if (name == levelsNames[i]) {
                 solaria.loadLevel(i);
                 return;
             }
@@ -519,15 +562,7 @@ var Solaria = (function () {
         }
 
 
-        //animation
-        for (var i in objects) {
-            if (objects[i].spriteholder != undefined) {
-                animationEngine.setX(objects[i].spriteholder, objects[i].vars["#x"]);
-                animationEngine.setY(objects[i].spriteholder, objects[i].vars["#y"]);
-                animationEngine.setZindex(objects[i].spriteholder, objects[i].vars["#z"]);
-                animationEngine.setState(objects[i].spriteholder, objects[i].vars["#state"]);
-            }
-        }
+
 
 
 
@@ -584,14 +619,14 @@ var Solaria = (function () {
                                 //For every shape of that kind in this object
                                 for (var k = 0; k < b1.collision[shape1].length; k++) {
                                     for (var l = 0; l < b2.collision[shape2].length; l++) {
-                                        var bodyShape1=b1.collision[shape1][k];
+                                        var bodyShape1 = b1.collision[shape1][k];
                                         var bodyShape2 = b2.collision[shape2][l];
                                         bodyShape1.x += b1.getVar("#x");
                                         bodyShape1.y += b1.getVar("#y");
                                         bodyShape2.x += b2.getVar("#x");
                                         bodyShape2.y += b2.getVar("#y");
                                         //Check if they collide
-                                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1,bodyShape2 ) == true) {
+                                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2) == true) {
                                             //Send the info to the #collide event handlers
                                             if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l }) == "#exit") {
                                                 return "#exit";
