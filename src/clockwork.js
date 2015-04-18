@@ -2,7 +2,7 @@
 //Arcadio Garcia Salvadores
 
 var Clockwork = (function () {
-    //This object stores the public functions
+    /*This object stores the public functions*/
     var clockwork = {};
     //The list of presets loaded
     var presets = {};
@@ -31,7 +31,7 @@ var Clockwork = (function () {
     collisions.shapes = [];
     collisions.detect = {};
 
-    //A reference to the loader
+    /*A reference to the loader*/
     clockwork.loader;
 
     //The DOM element that "holds" the engine
@@ -46,7 +46,7 @@ var Clockwork = (function () {
     //...................................
 
 
-    /**
+    /*
    *Starts the engine and loads the firt level
    * @param {Number} fps - The frames per second 
    */
@@ -57,7 +57,7 @@ var Clockwork = (function () {
         DOMholder = DOMelement;
     }
 
-    /**
+    /*
 *Starts (or restarts) the engine execution with the data loaded
 *
 */
@@ -66,7 +66,7 @@ var Clockwork = (function () {
         checkLoadQueue();
     }
 
-    /**
+    /*
   *Pauses the execution of the engine
   *
   */
@@ -74,7 +74,7 @@ var Clockwork = (function () {
         clearInterval(intervalholder);
     }
 
-    /**
+    /*
    *Gets the value of a global variable
    * @param {String} variable - The name of the variable
    */
@@ -83,9 +83,9 @@ var Clockwork = (function () {
     }
 
 
-    /**
+    /*
  *Sets the value of a globar variable
- @param {String} variable - The name of the variable
+ *@param {String} variable - The name of the variable
  * @param {Object} value - The value of the variable
  */
     clockwork.setEngineVar = function (variable, value) {
@@ -93,7 +93,7 @@ var Clockwork = (function () {
     }
 
 
-    /**
+    /*
 *Gets an object
 *@param {Object} variable - The object handler
 */
@@ -101,7 +101,7 @@ var Clockwork = (function () {
         return objects[variable];
     }
 
-    /**
+    /*
 *Gets an object
 *@param {Object} variable - The object name
 */
@@ -109,7 +109,7 @@ var Clockwork = (function () {
         return searchWhereDeep(objects, ["vars","name"], variable);
     }
 
-    /**
+    /*
 *Sets the animation engine
 *@param {Object} engine - The animation engine
 */
@@ -196,9 +196,10 @@ var Clockwork = (function () {
     }
 
 
-    /**
-   * @Private
+    /*
+   * 
    *@return A XMLHttpRequest object
+   *@Private
    */
     function getXMLHttpRequest() {
         if (window.XMLHttpRequest && !(window.ActiveXObject && isFileProtocol)) {
@@ -214,12 +215,14 @@ var Clockwork = (function () {
     }
 
 
-    /**
-     * @Private
+    /*
+     * 
      *Loads an xml file, runs the parser function and then executes the callback
      * @param {String} url - The url of the xml file
      * @param {Function} parser - The function that will read data from the xml
      * @param {Function} callback - A function that will be executed after the parser has finished
+     * @Private
+     *
      */
     function loadXMLFile(url, parser, callback) {
 
@@ -244,11 +247,12 @@ var Clockwork = (function () {
     //     Logger
     //....................
 
-    /**
-     * @Private
+    /*
+     * 
      *Sends a mesage to the logger, and it may print it on the console depending on the current value of debugMode
      * @param {String} text - The mesage to log
      * @param {Number} level - The priority level of the message (1 is error, 2 is warning) (see {@link setDebugMode})
+     *@Private
      */
     function debugLog(text, level) {
         if ((level || 2) <= debugMode) {
@@ -256,7 +260,7 @@ var Clockwork = (function () {
         }
     }
 
-    /**
+    /*
      *Sets the debug mode, which specifies what kind of log messages should be printed
      * @param {Number} level - The mode to set
      * When mode is set to 0, nothing will be shown in the console
@@ -372,7 +376,7 @@ var Clockwork = (function () {
     };
 
 
-    /**
+    /*
      *Loads the presets from a JavaScript object
      * @param {Object} presets - The object holding the presets
      */
@@ -421,7 +425,7 @@ var Clockwork = (function () {
     //      Levels
     //...................
 
-    /**
+    /*
     * Loads a level
     * @param {Number} n - The level number
     */
@@ -443,7 +447,7 @@ var Clockwork = (function () {
         clockwork.setup();
     };
 
-    /**
+    /*
  * Loads a level
  * @param {String} name - The level id
  */
@@ -457,7 +461,7 @@ var Clockwork = (function () {
     }
 
 
-    /**
+    /*
  * Loads the levels data from a XML file
  * @param {String} url - The url of the .xml
   * @param {Function} callback - A callback function
@@ -521,6 +525,11 @@ var Clockwork = (function () {
         }
     }
 
+    /*
+*Gets an object using its handler
+*@param {Object} i - The handler
+* @returns The object
+*/
     clockwork.getObject = function (i) {
         return objects[i];
     }
@@ -561,12 +570,13 @@ var Clockwork = (function () {
             return;
         }
 
-
-
-
-
-
     }
+
+    /*
+*Executes and events in all the objects that support it
+*@param {String} name - The name of the event
+* @param {Object} e_args - The arguments that the handler will receive
+*/
 
     clockwork.execute_event = function (name, e_args) {
         for (var i in objects) {
@@ -593,6 +603,11 @@ var Clockwork = (function () {
         }
         collisions.detect[shape1][shape2] = detector;
     }
+
+    /*
+*Registers more shapes and collisions detectors in the engine
+*@param {Object} collisionPackage - The object containing the shapes and collisions, see the structure in the examples at src/presets
+*/
 
     clockwork.registerCollision = function (collisionPackage) {
         for (var i = 0; i < collisionPackage.shapes.length; i++) {
