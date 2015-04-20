@@ -1,6 +1,6 @@
-# Clockwork.js
-A lightweight modular JavaScript game engine
 ![Clockwork logo](https://github.com/arcadiogarcia/Clockwork.js/blob/master/assets/clockwork.png?raw=true)
+A lightweight modular JavaScript game engine
+
 **Work in progress! Come back soon to see how to create awesome games with Clockwork.js**
 
 ##FAQ
@@ -22,7 +22,7 @@ A lightweight modular JavaScript game engine
 
   - *What does this engine do?*
 
-  This engine is focused mainly in allowing to implement the game logic using events and event handlers, define presets (think of them as C#/Java classes) that can be easily instantiated in levels, and use a modular engine so common elements (as input handlers, menu elements or even enemies) can be shared across games.
+  This engine is focused mainly in allowing to implement the game logic using events and event handlers, define presets (think of them as classes) that can be easily instantiated in levels, and use a modular engine so common elements (as input handlers, menu elements or even enemies) can be shared across games.
   This engine does not provide any functionality related to
   
   - *How do I use this engine?*
@@ -36,6 +36,110 @@ A lightweight modular JavaScript game engine
   - *I have written a nice preset that I want to share, may I add it to the collection included in the src/presets folder*
 
   Of course! It doesn't mind if it implements a game element (e.g. a progress bar), or is a wrapper to use a specific [Windows10/ApacheCordova/FirefoxOS/Web/whatever] feature, you are welcome to add it to the library collection.
+
+##Get started
+
+The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:
+
+ ```javascript
+var somePresets = [
+{
+    name: "someName",
+	inherits: "someOtherPreset",
+    sprite: "someSprite",
+    events: [
+        {
+            name: "someEvent", code: function (event) {
+                //TODO
+            }
+        },
+        ...
+    ],
+    collision: {
+        "someKindOfShape": [
+            { "x": 0, "y": 0, ... },
+			...
+        ],
+		...
+    },
+	vars: [
+	{ name: "someVariable", value: 1 },
+	...
+	]
+},
+...
+]
+ ```
+As you can see, you can specify many properties of the preset, but only the name is mandatory:
+
+  - *name* : Specifies the preset name, it must be unique.
+  - *inherits* : You can specify a preset from which the actual one will inherit the event handlers, sprite, collision shapes and variables (but they can be overwritten if you want to change them).
+  - *sprite* : Specifies the spritesheet used to draw the object in the screen.
+  - *events* : The event handlers will contain all the logic of your game. They are functions that will be executed when some event happens, they may accept parameters inside the event object and may also return something.
+  Event names beggining with # are reserved for the engine:
+    - #setup is executed when a level is loaded
+	- #loop is executed each frame
+	- #collide is executed when a collision is detected
+  You can use any other name to handle other events (input, inter-object interaction...).
+  - *collision* : Specifies the shapes that will act as hitboxes. They is an array of each category of shape, and you can define your own custom shapes (we'll get to that later).
+  - *vars* : Any variable that the object may need. You can also set them in the code, but if you define them here you can easily inherit and modify	the values.
+
+Then, you should write the levels .xml, which specify when and where will be the objects instantiated:
+
+```xml
+<levels>
+  <level id="someName">
+    <object name="someName" type="somePreset" x="100" y="100" z="2" vars='{"w":90}'></object>
+	...
+  </level>
+  ...
+</levels>
+```
+
+You can specify as many levels as you want, and they must have unique names.
+When you load a level, all the objects that it contains will be instantiated:
+  - *name* : Specifies a unique name for the object that will allow you to reference it from other objects.
+  - *type* : Specifies the preset used to create the object.
+  - *x*, *y*, *z*: Specify the coordinates of the object. Z is not mandatory, but recomended even in 2d games to control the order in which objects are drawn.
+  - *vars* : They will be added or overwrite the preset variables.
+
+Once you have written both the presets and the levels, you will be able to run your game:
+
+  1. First of all, include the engine and the file with your presets:
+
+  ```html
+   <script src="Clockwork.js"></script>
+   <script src="myPresets.js"></script>
+  ``
+
+  2. Intanstiate the Clockwork engine:
+
+  ```javascript
+  var engineInstance = new Clockwork();
+  ```
+
+  3. Specify which animation library will you use. For 2D games, we recomend you to use [Spritesheet.js](https://github.com/arcadiogarcia/Spritesheet.js), which specifically was developed to be used with Clockwork.js. The library will handle all the rendering and the loading of the spritesheets, Clockwork.js will only tell the library what to draw.
+
+   ```javascript
+  engineInstance.setAnimationEngine(canvasAnimation);
+  ```
+
+  4. Load as many presets you neeed.
+
+   ```javascript
+  engineInstance.loadPresets(somePresets);
+  engineInstance.loadPresets(otherPresets);
+  ```
+
+  5. Load the levels and use the callback to start the engine.
+
+   ```javascript
+   engineInstance.loadLevelsFromXML("levels.xml", function () {
+                engineInstance.start(30, document.getElementById("canvas"));
+	});  
+	```
+	The start method expects the fps and a DOM element that will be used for input (will register clicks, key presses...).
+
 
 ##Examples
 
@@ -55,19 +159,22 @@ There are no known bugs, if you find one please report it! (or even better, fix 
 
 These items are on the roadmap:
 
-  -**Animation library sample wrapper**
+  - **Animation library sample wrapper**
   Provide an example of the methods that the animation library used must implement.
+
 
   - **Editor**:
   Develop a drag and drop editor to create levels more easily.
+
 
   - **More presets**
   Write presets to handle other input methods: keyboard, pointers, accelerometer...
   Also, write platform specific presets (e.g. notifications, live tiles for Windows).
 
+
   - **More collision detectors**
   Add support for more complex (e.g. concave) shapes.
 
-  ##Contact
+##Contact
 
-  You can contact the creator of the engine at [@arcadio_g_s](http://www.twitter.com/arcadio_g_s) on Twitter.
+You can contact the creator of the engine at [@arcadio_g_s](http://www.twitter.com/arcadio_g_s) on Twitter.
