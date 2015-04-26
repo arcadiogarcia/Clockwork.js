@@ -37,7 +37,7 @@ A lightweight modular JavaScript game engine
 
   Of course! It doesn't mind if it implements a game element (e.g. a progress bar), or is a wrapper to use a specific [Windows10/ApacheCordova/FirefoxOS/Web/whatever] feature, you are welcome to add it to the library collection.
 
-   - **Can I use [Some library] for the animation?**
+  - **Can I use [Some library] for the animation?**
 
   Yes, you will only have to write a wrapper, more info about that soon.
 
@@ -116,7 +116,7 @@ Once you have written both the presets and the levels, you will be able to run y
    <script src="myPresets.js"></script>
   ```
 
-  2. Intanstiate the Clockwork engine:
+  2. Instantiate the Clockwork engine:
 
   ```javascript
   var engineInstance = new Clockwork();
