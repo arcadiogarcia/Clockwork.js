@@ -14,8 +14,14 @@ http.listen(3000, function(){
 });
 
 io.on('connection', function(socket){
-  console.log('A clockwork.js client connected');
+    console.log('A clockwork.js client connected');
+    socket.on('event', function (data) { 
+        ClockworkServer.execute_event(data.name, data.args);
+        socket.broadcast.emit('event', data); 
+    }); 
 });
+
+
 
 
 //Clockwork engine
@@ -23,7 +29,7 @@ io.on('connection', function(socket){
 /**
 *@class
 */
-var Clockwork = (function () {
+var ClockworkServer = (function () {
     /**This object stores the public functions*/
     var clockwork = this;
     //The list of presets loaded
@@ -679,4 +685,4 @@ var Clockwork = (function () {
     }
 
     return clockwork;
-});
+})();
