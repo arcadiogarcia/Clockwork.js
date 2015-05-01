@@ -575,6 +575,9 @@ var Clockwork = (function () {
     this.execute_event = function (name, e_args) {
         for (var i in objects) {
             var body = objects[i];
+            if (body.execute_event("#", {"name":name,"args":e_args}) == "#exit") {
+                return "#exit";
+            }
             if (body.execute_event(name, e_args) == "#exit") {
                 return "#exit";
             }
