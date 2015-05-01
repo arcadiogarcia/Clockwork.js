@@ -121,6 +121,15 @@ var Clockwork = (function () {
     };
 
 
+  /**
+*Gets the animation engine
+*@return {Object} engine - The animation engine
+*/
+    this.getAnimationEngine = function () {
+        return animationEngine;
+    };
+
+
 
     //....................
     //     JS Tools
