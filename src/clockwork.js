@@ -58,7 +58,7 @@ var Clockwork = (function () {
         started = true;
         clockwork.loadLevel(0);
         DOMholder = DOMelement;
-    }
+    };
 
     /**
 *Starts (or restarts) the engine execution with the data loaded
@@ -67,7 +67,7 @@ var Clockwork = (function () {
     this.setup = function () {
         clockwork.execute_event("#setup");
         checkLoadQueue();
-    }
+    };
 
     /**
   *Pauses the execution of the engine
@@ -75,7 +75,7 @@ var Clockwork = (function () {
   */
     this.pause = function () {
         clearInterval(intervalholder);
-    }
+    };
 
     /**
    *Gets the value of a global variable
@@ -83,7 +83,7 @@ var Clockwork = (function () {
    */
     this.getEngineVar = function (variable) {
         return globalvars[variable];
-    }
+    };
 
 
     /**
@@ -93,7 +93,7 @@ var Clockwork = (function () {
  */
     this.setEngineVar = function (variable, value) {
         globalvars[variable] = value;
-    }
+    };
 
 
     /**
@@ -102,7 +102,7 @@ var Clockwork = (function () {
 */
     this.getObject = function (variable) {
         return objects[variable];
-    }
+    };
 
     /**
 *Gets an object
@@ -110,7 +110,7 @@ var Clockwork = (function () {
 */
     this.find = function (variable) {
         return searchWhereDeep(objects, ["vars","name"], variable);
-    }
+    };
 
     /**
 *Sets the animation engine
@@ -118,7 +118,7 @@ var Clockwork = (function () {
 */
     this.setAnimationEngine = function (engine) {
         animationEngine = engine;
-    }
+    };
 
 
 
@@ -211,7 +211,7 @@ var Clockwork = (function () {
             try {
                 return new (ActiveXObject)("MSXML2.XMLHTTP.3.0");
             } catch (e) {
-                log("browser doesn't support AJAX.");
+                debugLog("browser doesn't support AJAX.");
                 return null;
             }
         }
@@ -236,7 +236,7 @@ var Clockwork = (function () {
                 parser(xmlhttp.responseXML);
                 callback();
             }
-        }
+        };
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 
@@ -348,16 +348,7 @@ var Clockwork = (function () {
     function addPresetHandler(name, event, somefunction) {
         presets[name].eventfunction[event] = somefunction;
     }
-
-    //Not used anymore, slower and less secure than just addPreset
-    //But needed if implementing loading presets from a file != .js
-    function addPresetHandlerFromText(name, event, functiontext) {
-        try {
-            addPresetEvent(name, event, new Function("event", functiontext));
-        } catch (e) {
-            debugLog("Syntax error in object " + name + ", event " + event, 1)
-        }
-    };
+    
 
     function addPresetVar(name, variable, value) {
         presets[name].vars[variable] = value;
@@ -461,7 +452,7 @@ var Clockwork = (function () {
                 return;
             }
         }
-    }
+    };
 
 
     /**
@@ -535,7 +526,7 @@ var Clockwork = (function () {
 */
     this.getObject = function (i) {
         return objects[i];
-    }
+    };
     //...................
     //     Sprites
     //...................
@@ -589,7 +580,7 @@ var Clockwork = (function () {
             }
         }
 
-    }
+    };
 
     //..........................
     //     Colisions
@@ -619,7 +610,7 @@ var Clockwork = (function () {
         for (i = 0; i < collisionPackage.detectors.length; i++) {
             registerCollisionDetector(collisionPackage.detectors[i].shape1, collisionPackage.detectors[i].shape2, collisionPackage.detectors[i].detector);
         }
-    }
+    };
 
     function processCollisions() {
         //For every pair of (different) objects
