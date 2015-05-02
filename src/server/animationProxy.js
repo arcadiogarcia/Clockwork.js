@@ -41,8 +41,9 @@ var animationProxy = function (animationEngine,clockwork) {
     };
 
     animationInterface.addObject = function (spritesheet, state, x, y, zindex, isstatic, doesnottimetravel) {
-        animationEngine.addObject(spritesheet, state, x, y, zindex, isstatic, doesnottimetravel);
+        var id= animationEngine.addObject(spritesheet, state, x, y, zindex, isstatic, doesnottimetravel);
         clockwork.getEngineVar("socket").emit('animation', {
+            "id":id,
             "action":"addObject",
             "spritesheet":spritesheet,
             "state":state,
