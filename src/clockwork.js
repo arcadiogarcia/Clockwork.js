@@ -670,5 +670,4 @@ var Clockwork = (function () {
         }
     }
 
-    return clockwork;
 });

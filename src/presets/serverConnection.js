@@ -11,7 +11,7 @@ var serverConnection = [
          {
              name: "#setup", code: function (event) {
                 this.engine.setEngineVar("socket",io());
-                io.on('connection', function(socket){
+                this.engine.getEngineVar("socket").on('connection', function(socket){
                     socket.on('event', function(data){
                         this.engine.execute_event(data.name, data.args);
                     });
@@ -48,8 +48,14 @@ var serverConnection = [
                         }
                     });
                 });
+             this.engine.loadLevel(this.engine.getEngineVar("#currentlevel")+1);
              }
-         },
+         }
+    ]
+},
+{
+    name: "serverEventHandler",
+    events: [
           {
              name: "#", code: function (event) {
                  this.engine.getEngineVar("socket").emit('event', {"name":event.name,"args":event.args});

@@ -32,12 +32,16 @@ var animationProxy = function (animationEngine,clockwork) {
 
     animationInterface.clear = function () {
         animationEngine.clear();
-        clockwork.getEngineVar("socket").emit('animation', {"action":"clear"});
+        if(clockwork.getEngineVar("socket")){
+            clockwork.getEngineVar("socket").emit('animation', {"action":"clear"});
+        }
     };
 
     animationInterface.setCamera = function (x,y) {
         animationEngine.setCamera(x,y);
-        clockwork.getEngineVar("socket").emit('animation', {"action":"setCamera","x":x,"y":y});
+        if(clockwork.getEngineVar("socket")){
+            clockwork.getEngineVar("socket").emit('animation', {"action":"setCamera","x":x,"y":y});
+        }
     };
 
     animationInterface.addObject = function (spritesheet, state, x, y, zindex, isstatic, doesnottimetravel) {
@@ -61,6 +65,8 @@ var animationProxy = function (animationEngine,clockwork) {
     };
     
     var hashMapID ={};
+    
+    animationInterface.local = {};
     
      animationInterface.local.setX = function (id, value) {
         animationEngine.setX(hashMapID[id], value);
