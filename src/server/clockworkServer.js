@@ -19,6 +19,11 @@ io.on('connection', function(socket){
         ClockworkServer.execute_event(data.name, data.args);
         socket.broadcast.emit('event', data); 
     }); 
+     socket.on('animation', function(data){               
+       data.id=socket.id+">>>"+data.id;
+       data.socketId=socket.id;
+       socket.broadcast.emit('animation', data); 
+     });
 });
 
 

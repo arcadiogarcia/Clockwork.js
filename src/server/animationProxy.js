@@ -58,6 +58,44 @@ var animationProxy = function (animationEngine,clockwork) {
         animationEngine.deleteObject(id);
         clockwork.getEngineVar("socket").emit('animation', {"action":"deleteObject","id":id});
     };
+    
+    var hashMapID ={};
+    
+     animationInterface.local.setX = function (id, value) {
+        animationEngine.setX(hashMapID[id], value);
+    };
+
+    animationInterface.local.setY = function (id, value) {
+        animationEngine.setY(hashMapID[id],value);
+    };
+
+    animationInterface.local.setZindex = function (id, value) {
+        animationEngine.setZindex(hashMapID[id],value);
+    };
+
+    animationInterface.local.setState = function (id, state) {
+        animationEngine.setState(hashMapID[id],state);
+    };
+
+    animationInterface.local.setParameter = function (id, parameter, value) {
+        animationEngine.setParameter(hashMapID[id],parameter,value);
+    };
+
+    animationInterface.local.clear = function () {
+        animationEngine.clear();
+    };
+
+    animationInterface.local.setCamera = function (x,y) {
+        animationEngine.setCamera(x,y);
+    };
+
+    animationInterface.local.addObject = function (id,spritesheet, state, x, y, zindex, isstatic, doesnottimetravel) {
+        hashMapID[id]=animationEngine.addObject(spritesheet, state, x, y, zindex, isstatic, doesnottimetravel);
+    };
+
+    animationInterface.local.deleteObject = function (id) {
+        animationEngine.deleteObject(hashMapID[id]);
+    };
 
     return animationInterface;
 };
