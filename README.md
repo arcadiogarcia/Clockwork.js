@@ -1,7 +1,6 @@
 ![Clockwork logo](https://github.com/arcadiogarcia/Clockwork.js/blob/master/assets/clockwork.png?raw=true)
 A lightweight modular JavaScript game engine
 
-**Work in progress! Come back soon to see how to create awesome games with Clockwork.js**
 
 ##FAQ
   - **Can I use this engine?**
@@ -40,6 +39,10 @@ A lightweight modular JavaScript game engine
   - **Can I use [Some library] for the animation?**
 
   Yes, you will only have to write a wrapper, more info about that soon.
+  
+  - **Can I make a multiplayer game?**
+
+  Since the Clockwork.js is event based, it is very easy to communicate many engine instances. There is a general-purpose  implementation already written in examples/example5, that can be adapted to fit your specific needs.
 
 ##Get started
 
@@ -151,7 +154,11 @@ Check out [examples/example1/example1.html](https://github.com/arcadiogarcia/Clo
 
 Check out [examples/example2/gamePresets.js](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example2/gamePresets.js) to learn to write the presets needed for a basic game.
 
-Check out [examples/example3/gamePresets.js](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example2/gamePresets.js) to see how to add more advanced features to the previous game.
+Check out [examples/example3/gamePresets.js](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example3/gamePresets.js) to see how to add more advanced features to the previous game.
+
+Check out [examples/example4/DOManimation.js](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example4/DOManimation.js) to see how to write your own animation library.
+
+Check out [examples/example5s](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example5) to see how to run  a instance of the game engine on a Node.js server to create multiplayer games easily (using Socket.io).
 
 If you are interested in the animation and rendering, you should learn more about [Spritesheet.js](https://github.com/arcadiogarcia/Spritesheet.js), the 2D animation library specifically developed to be used with Clockwork.js. You can find the spritesheets used by the examples in [examples/shared](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/shared). Thanks to [Silvia Barbero](http://silvishinystar.deviantart.com/) for allowing me to use her dog sprite!
 
@@ -164,7 +171,7 @@ There are no known bugs, if you find one please report it! (or even better, fix 
 These items are on the roadmap:
 
   - **Animation library sample wrapper**
-  Provide an example of the methods that the animation library used must implement.
+  ~~Provide an example of the methods that the animation library used must implement.~~ [examples/example4/DOManimation.js](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example4/DOManimation.js) shows how to write a simple animation library, and you can find more exaples in src/animation.
 
 
   - **Editor**:
