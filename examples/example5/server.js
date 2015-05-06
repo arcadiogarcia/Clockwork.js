@@ -1,3 +1,43 @@
+//The client-server connection is done using express+socket.io
+
+console.log('Node.js running');
+
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var fs = require('fs');
+var path = require('path'); 
+
+app.use(express.static(__dirname+'/public'));
+
+http.listen(process.env.PORT, function(){
+    console.log('Clockwork.js listening on '+process.env.PORT);
+
+});
+
+var pendingAnimation=[];
+
+io.on('connection', function(socket){
+    console.log('A clockwork.js client connected');
+    for(var i=0;i<pendingAnimation.length;i++){
+        socket.emit('animation', pendingAnimation[i]);
+    }
+    socket.on('event', function (data) { 
+        ClockworkServer.execute_event(data.name, data.args);
+        socket.broadcast.emit('event', data); 
+    });
+     socket.on('animation', function(data){        
+       data.id=socket.id+">>>"+data.id;
+       data.socketId=socket.id;
+       console.log('>>>>Animation:    '+data.action+"    "+data.id);    
+       console.log(data);      
+       socket.broadcast.emit('animation', data); 
+       pendingAnimation.push(data);
+     });
+});
+
+
 //Clockwork engine
 //Arcadio Garcia Salvadores
 /**
@@ -208,24 +248,7 @@ var Clockwork = (function () {
     }
 
 
-    /**
-   * 
-   *@return A XMLHttpRequest object
-   *@Private
-   */
-    function getXMLHttpRequest() {
-        if (window.XMLHttpRequest && !(window.ActiveXObject && isFileProtocol)) {
-            return new (XMLHttpRequest);
-        } else {
-            try {
-                return new (ActiveXObject)("MSXML2.XMLHTTP.3.0");
-            } catch (e) {
-                debugLog("browser doesn't support AJAX.");
-                return null;
-            }
-        }
-    }
-
+  
 
     /**
      * 
@@ -238,16 +261,15 @@ var Clockwork = (function () {
      */
     function loadXMLFile(url, parser, callback) {
 
-        var xmlhttp = getXMLHttpRequest();
-
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                parser(xmlhttp.responseXML);
-                callback();
-            }
-        };
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
+    fs.readFile(url, 'ascii', function(err,data){
+    if(err) {
+        return;
+    }
+    var Dom = require('xmldom').DOMParser;
+    var doc = new Dom().parseFromString(data.substring(2,data.lenght));
+    parser(doc);
+    callback();
+});
 
     }
 
@@ -671,3 +693,65 @@ var Clockwork = (function () {
     }
 
 });
+
+var ClockworkServer = new Clockwork();
+ClockworkServer.setAnimationEngine((function (clockwork) {
+
+    var animationInterface = {};
+    var maxid=0;
+  
+    animationInterface.setX = function (id, value) {
+        io.sockets.emit('animation', {"action":"setX","id":id,"value":value});
+    };
+
+    animationInterface.setY = function (id, value) {
+        io.sockets.emit('animation', {"action":"setY","id":id,"value":value});
+    };
+
+    animationInterface.setZindex = function (id, value) {
+        io.sockets.emit('animation', {"action":"setZindex","id":id,"value":value});
+    };
+
+    animationInterface.setState = function (id, state) {
+        io.sockets.emit('animation', {"action":"setState","id":id,"state":state});
+    };
+
+    animationInterface.setParameter = function (id, parameter, value) {
+        io.sockets.emit('animation', {"action":"setParameter","parameter":parameter,"value":value});
+    };
+
+    animationInterface.clear = function () {
+        io.sockets.emit('animation', {"action":"clear"});
+    };
+
+    animationInterface.setCamera = function (x,y) {
+        io.sockets.emit('animation', {"action":"setCamera","x":x,"y":y});
+    };
+
+    animationInterface.addObject = function (spritesheet, state, x, y, zindex, isstatic, doesnottimetravel) {
+        var id= maxid++;
+        io.sockets.emit('animation', {
+            "id":id,
+            "action":"addObject",
+            "spritesheet":spritesheet,
+            "state":state,
+            "x":x,
+            "y":y,
+            "zindex":zindex,
+            "isstatic":isstatic,
+            "doesnottimetravel":doesnottimetravel
+            });
+    };
+
+    animationInterface.deleteObject = function (id) {
+        io.sockets.emit('animation', {"action":"deleteObject","id":id});
+    };
+    
+    return animationInterface;
+    
+})(ClockworkServer));
+
+
+ClockworkServer.loadLevelsFromXML("levels.xml", function () {
+                ClockworkServer.start(30, null);
+ });
