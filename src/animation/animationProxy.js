@@ -33,7 +33,7 @@ var animationProxy = function (animationEngine,clockwork) {
     animationInterface.clear = function () {
         animationEngine.clear();
         if(clockwork.getEngineVar("socket")){
-            clockwork.getEngineVar("socket").emit('animation', {"action":"clear"});
+            //clockwork.getEngineVar("socket").emit('animation', {"action":"clear"});
         }
     };
 
@@ -57,6 +57,7 @@ var animationProxy = function (animationEngine,clockwork) {
             "isstatic":isstatic,
             "doesnottimetravel":doesnottimetravel
             });
+            return id;
     };
 
     animationInterface.deleteObject = function (id) {

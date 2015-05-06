@@ -7,19 +7,18 @@
     
     <!--This has to be included for the sever connection-->
      
-    <!--Just for testing, obviously this should reference the real sever-->
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="socket.io/socket.io.js"></script>
         
-    <script src="../../src/server/animationProxy.js"></script>
-    <script src="../../src/presets/serverConnection.js"></script>
+    <script src="animationProxy.js"></script>
+    <script src="serverConnection.js"></script>
    
     <!--End server requirements-->
     
     <script src="dogPreset.js"></script>
-    <script src="../../src/Clockwork.js"></script>
-    <script src="../../src/collisions/pointsAndBoxes.js"></script>
-    <script src="../../src/presets/basicMouse.js"></script>
-    <script src="../shared/spritesheet.js"></script>
+    <script src="Clockwork.js"></script>
+    <script src="pointsAndBoxes.js"></script>
+    <script src="basicMouse.js"></script>
+    <script src="spritesheet.js"></script>
 </head>
 <body style="background-color:#000;">
     <canvas id="canvas" width="800" height="400" style="background-color:#FFF;"></canvas>
@@ -30,12 +29,13 @@
         var canvasAnimation = new Spritesheet();
         canvasAnimation.setUp(document.getElementById("canvas"), 30);
         canvasAnimation.setBufferSize(800, 400);
-        canvasAnimation.asyncLoad("../shared/spritesheet_paradog.xml", callback_load);
+        canvasAnimation.asyncLoad("spritesheet_paradog.xml", callback_load);
 
+        var engineInstance;
         //This function is executed after Spritesheet.js loads
         function callback_load() {
             //This is where Clockwork.js starts
-            var engineInstance = new Clockwork();
+            engineInstance = new Clockwork();
             engineInstance.setAnimationEngine(animationProxy(canvasAnimation,engineInstance));
             engineInstance.registerCollision(ClockworkCollisions.pointsAndBoxes);
             engineInstance.loadPresets(basicClickPreset);
@@ -43,7 +43,7 @@
             engineInstance.loadPresets(serverConnection);
             engineInstance.loadLevelsFromXML("levels.xml", function () {
                 engineInstance.start(30, document.getElementById("canvas"));
-            })  
+            });
         }
     </script>
 </body>
