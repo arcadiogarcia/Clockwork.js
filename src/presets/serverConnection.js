@@ -11,12 +11,12 @@ var serverConnection = [
          {
              name: "#setup", code: function (event) {
                 this.engine.setEngineVar("socket",io());
-                this.engine.getEngineVar("socket").on('connection', function(socket){
-                    socket.on('event', function(data){
-                        this.engine.execute_event(data.name, data.args);
+                var that=this;
+                this.engine.getEngineVar("socket").on('event', function(data){
+                        that.engine.execute_event(data.name, data.args);
                     });
-                     socket.on('animation', function(data){
-                        var animationEngine=this.engine.getAnimationEngine();
+                this.engine.getEngineVar("socket").on('animation', function(data){
+                        var animationEngine=that.engine.getAnimationEngine();
                         switch(data.action){
                             case "setX":
                                 animationEngine.local.setX(data.id,data.value);
@@ -47,7 +47,6 @@ var serverConnection = [
                                 break;
                         }
                     });
-                });
              this.engine.loadLevel(this.engine.getEngineVar("#currentlevel")+1);
              }
          }
@@ -58,7 +57,9 @@ var serverConnection = [
     events: [
           {
              name: "#", code: function (event) {
-                 this.engine.getEngineVar("socket").emit('event', {"name":event.name,"args":event.args});
+                 if(event.name[0]!="#"&&event.name[0]!="@"){
+                    this.engine.getEngineVar("socket").emit('event', {"name":event.name,"args":event.args});
+                 }
              }
          }
     ]

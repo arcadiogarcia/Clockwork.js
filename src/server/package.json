@@ -1,9 +1,0 @@
-{
-  "name": "ClockworkServer",
-  "version": "0.0.1",
-  "description": "A backend for multiplayer games with Clockwork.js",
-  "dependencies": {
-    "express": "^4.12.3",
-    "socket.io": "^1.3.5"
-  }
-}
