@@ -5,14 +5,36 @@ var animationProxy = function (animationEngine,clockwork) {
 
     var animationInterface = {};
 
+    var sendStopSignal=[];
+    
+    var time=0;
+    
+    animationInterface.tick = function (dt) {
+        time += dt;   
+    };
+
     animationInterface.setX = function (id, value) {
         animationEngine.setX(id, value);
-        clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value});
+        clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value,"time":time});
+        sendStopSignal[id]=sendStopSignal[id]||{};
+        sendStopSignal[id].x=value;
+        window.setTimeout(function(id,sendStopSignal,value){
+            if(sendStopSignal[id].x==value){
+                clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value,"time":time});
+            }
+        },50,id,sendStopSignal,value);
     };
 
     animationInterface.setY = function (id, value) {
         animationEngine.setY(id,value);
-        clockwork.getEngineVar("socket").emit('animation', {"action":"setY","id":id,"value":value});
+        clockwork.getEngineVar("socket").emit('animation', {"action":"setY","id":id,"value":value,"time":time});
+        sendStopSignal[id]=sendStopSignal[id]||{};
+        sendStopSignal[id].y=value;
+        window.setTimeout(function(id,sendStopSignal,value){
+            if(sendStopSignal[id].y==value){
+                clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value,"time":time});
+            }
+        },50,id,sendStopSignal,value);
     };
 
     animationInterface.setZindex = function (id, value) {
@@ -70,23 +92,33 @@ var animationProxy = function (animationEngine,clockwork) {
     animationInterface.local = {};
     
      animationInterface.local.setX = function (id, value) {
+         if(hashMapID[id]!=undefined){
         animationEngine.setX(hashMapID[id], value);
+         }
     };
 
     animationInterface.local.setY = function (id, value) {
+         if(hashMapID[id]!=undefined){
         animationEngine.setY(hashMapID[id],value);
+        }
     };
 
     animationInterface.local.setZindex = function (id, value) {
+         if(hashMapID[id]!=undefined){
         animationEngine.setZindex(hashMapID[id],value);
+         }
     };
 
     animationInterface.local.setState = function (id, state) {
+        if(hashMapID[id]!=undefined){
         animationEngine.setState(hashMapID[id],state);
+        }
     };
 
     animationInterface.local.setParameter = function (id, parameter, value) {
+        if(hashMapID[id]!=undefined){
         animationEngine.setParameter(hashMapID[id],parameter,value);
+        }
     };
 
     animationInterface.local.clear = function () {
@@ -102,7 +134,9 @@ var animationProxy = function (animationEngine,clockwork) {
     };
 
     animationInterface.local.deleteObject = function (id) {
+        if(hashMapID[id]!=undefined){
         animationEngine.deleteObject(hashMapID[id]);
+        }
     };
 
     return animationInterface;

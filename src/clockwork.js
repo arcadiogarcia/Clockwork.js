@@ -564,6 +564,10 @@ var Clockwork = (function () {
     //......................
 
     function loop() {
+        
+        if(animationEngine.tick!=undefined){
+            animationEngine.tick(1000/fps);
+        }
 
         if (processCollisions() == "#exit") {
             return;
