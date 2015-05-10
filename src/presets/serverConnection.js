@@ -41,14 +41,16 @@ var serverConnection = [
                                 buffer.timeouts=[];
                                 var setter=function(data,vel,buffer){
                                     animationEngine.local[data.action](data.id,vel+buffer.actual);
+                                    console.log("add v:"+vel);
                                     buffer.actual+=vel;
                                 };
-                                var dt=buffer.actualTime-buffer.lastTime;
+                                var dt=(buffer.actualTime-buffer.lastTime);
                                 var dx=buffer.actual-buffer.last;
-                                if(dx/dt!=buffer.v){
+                                var v=dx/dt*1000/30;
+                                if(v!=buffer.v){
                                     window.clearInterval(buffer.intervalHolder);
-                                    buffer.intervalHolder=(window.setInterval(setter,1000/30,data,dx/dt,buffer));
-                                    buffer.v=dx/dt;
+                                    buffer.intervalHolder=(window.setInterval(setter,1000/30,data,v,buffer));
+                                    buffer.v=v;
                                 }
                                 }
                                 break;
@@ -68,7 +70,7 @@ var serverConnection = [
                                 animationEngine.local.setCamera(data.x,data.y);
                                 break;
                             case "addObject":
-                                animationEngine.local.addObject(data.id,data.spritesheet,data.state,data.state,data.x,data.y,data.zindex,data.isstatic,data.doesnottimetravel);
+                                animationEngine.local.addObject(data.id,data.spritesheet,data.state,data.x,data.y,data.zindex,data.isstatic,data.doesnottimetravel);
                                 break;
                             case "deleteObject":
                                 animationEngine.local.deleteObject(data.id);
