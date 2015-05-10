@@ -18,6 +18,7 @@
     <script src="Clockwork.js"></script>
     <script src="pointsAndBoxes.js"></script>
     <script src="basicMouse.js"></script>
+    <script src="keyboard.js"></script>
     <script src="spritesheet.js"></script>
 </head>
 <body style="background-color:#000;">
@@ -41,6 +42,7 @@
             engineInstance.loadPresets(basicClickPreset);
             engineInstance.loadPresets(dog);
             engineInstance.loadPresets(serverConnection);
+            engineInstance.loadPresets(keyboard);
             engineInstance.loadLevelsFromXML("levels.xml", function () {
                 engineInstance.start(30, document.getElementById("canvas"));
             });

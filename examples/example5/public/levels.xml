@@ -5,7 +5,7 @@
   </level>
   <level id="demo">
     <object name="socket" type="serverEventHandler" x="0" y="0" ></object>
-    <object name="someDog1" type="dog" x="100" y="100" ></object>
-    <object name="someMouse" type="basicMouse" x="0" y="0" ></object>
+    <object name="someDog1" type="dog" x="100" y="270" ></object>
+    <object name="keyboard" type="keyboard" x="0" y="0" ></object>
   </level>
 </levels>

@@ -16,10 +16,15 @@ http.listen(process.env.PORT, function(){
 
 });
 
+var pendingCreation=[];
 var pendingAnimation=[];
+
 
 io.on('connection', function(socket){
     console.log('A clockwork.js client connected');
+    for(var i=0;i<pendingCreation.length;i++){
+        socket.emit('animation', pendingCreation[i]);
+    }
     for(var i=0;i<pendingAnimation.length;i++){
         socket.emit('animation', pendingAnimation[i]);
     }
@@ -33,9 +38,46 @@ io.on('connection', function(socket){
        console.log('>>>>Animation:    '+data.action+"    "+data.id);    
        console.log(data);      
        socket.broadcast.emit('animation', data); 
-       pendingAnimation.push(data);
+       //Now we delete irrelevant previous actions from the memory
+       //And we store the new one
+        switch(data.action){
+                            case "setX":
+                            case "setY":
+                            case "setZindex":
+                            case "setState":
+                                pendingAnimation=pendingAnimation.filter(function(x){ return x.id!=data.id||x.action!=data.action;});
+                                pendingAnimation.push(data);
+                                break;
+                            case "setCamera":
+                                pendingAnimation=pendingAnimation.filter(function(x){ return x.action!=data.action;});
+                                 pendingAnimation.push(data);
+                                break;
+                            case "setParameter":
+                                 pendingAnimation.push(data);
+                                break;
+                            case "clear":
+                                 pendingCreation=[];
+                                  pendingAnimation=[];
+                                break;
+                            case "addObject":
+                                  pendingCreation.push(data);
+                                 break;
+                            case "deleteObject":
+                                pendingCreation=pendingCreation.filter(function(x){ return x.id!=data.id;});
+                                pendingAnimation=pendingAnimation.filter(function(x){ return x.id!=data.id;});
+                                break;
+                        }
+
+       
      });
 });
+
+
+setInterval(function(){
+     for(var i=0;i<pendingAnimation.length;i++){
+        io.sockets.emit('animation', pendingAnimation[i]);
+    }
+},1000);
 
 
 //Clockwork engine
