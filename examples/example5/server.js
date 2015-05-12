@@ -18,19 +18,37 @@ http.listen(process.env.PORT, function(){
 
 var pendingCreation=[];
 var pendingAnimation=[];
+var pendingEvents=[];
 
 
 io.on('connection', function(socket){
     console.log('A clockwork.js client connected');
     for(var i=0;i<pendingCreation.length;i++){
-        socket.emit('animation', pendingCreation[i]);
+        socket.emit('animation', pendingCreation[i].message);
     }
     for(var i=0;i<pendingAnimation.length;i++){
-        socket.emit('animation', pendingAnimation[i]);
+        socket.emit('animation', pendingAnimation[i].message);
+    }
+    for(var i=0;i<pendingEvents.length;i++){
+        socket.emit('animation', pendingEvents[i].message);
     }
     socket.on('event', function (data) { 
+        data.args.id=socket.id;
+        if(data.args["%keep%"]==true){
+            pendingEvents.push({owner:socket.id,message:data});
+        }
         ClockworkServer.execute_event(data.name, data.args);
         socket.broadcast.emit('event', data); 
+    });
+    socket.on('disconnect', function(data){
+            var toDelete=pendingCreation.filter(function(x){ return x.owner==socket.id;});
+            pendingCreation=pendingCreation.filter(function(x){ return x.owner!=socket.id;});
+            pendingAnimation=pendingAnimation.filter(function(x){ return x.owner!=socket.id;}); 
+             pendingEvents=pendingEvents.filter(function(x){ return x.owner!=socket.id;}); 
+            for(var i=0;i<toDelete.length;i++){
+                toDelete[i].message.action="deleteObject";
+                 socket.broadcast.emit('animation', toDelete[i].message);
+            }                         
     });
      socket.on('animation', function(data){        
        data.id=socket.id+">>>"+data.id;
@@ -45,26 +63,26 @@ io.on('connection', function(socket){
                             case "setY":
                             case "setZindex":
                             case "setState":
-                                pendingAnimation=pendingAnimation.filter(function(x){ return x.id!=data.id||x.action!=data.action;});
-                                pendingAnimation.push(data);
+                                pendingAnimation=pendingAnimation.filter(function(x){ return x.message.id!=data.id||x.message.action!=data.action;});
+                                pendingAnimation.push({owner:socket.id,message:data});
                                 break;
                             case "setCamera":
-                                pendingAnimation=pendingAnimation.filter(function(x){ return x.action!=data.action;});
-                                 pendingAnimation.push(data);
+                                pendingAnimation=pendingAnimation.filter(function(x){ return x.message.action!=data.action;});
+                                 pendingAnimation.push({owner:socket.id,message:data});
                                 break;
                             case "setParameter":
-                                 pendingAnimation.push(data);
+                                 pendingAnimation.push({owner:socket.id,message:data});
                                 break;
                             case "clear":
                                  pendingCreation=[];
                                   pendingAnimation=[];
                                 break;
                             case "addObject":
-                                  pendingCreation.push(data);
+                                  pendingCreation.push({owner:socket.id,message:data});
                                  break;
                             case "deleteObject":
-                                pendingCreation=pendingCreation.filter(function(x){ return x.id!=data.id;});
-                                pendingAnimation=pendingAnimation.filter(function(x){ return x.id!=data.id;});
+                                pendingCreation=pendingCreation.filter(function(x){ return x.message.id!=data.id;});
+                                pendingAnimation=pendingAnimation.filter(function(x){ return x.message.id!=data.id;});
                                 break;
                         }
 
@@ -75,7 +93,7 @@ io.on('connection', function(socket){
 
 setInterval(function(){
      for(var i=0;i<pendingAnimation.length;i++){
-        io.sockets.emit('animation', pendingAnimation[i]);
+        io.sockets.emit('animation', pendingAnimation[i].message);
     }
 },1000);
 

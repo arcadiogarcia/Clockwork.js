@@ -6,20 +6,20 @@ var basicClickPreset = [
     events: [
         {
             name: "#setup", code: function (event) {
-                this.setVar("listener_click", window.addEventListener("click", (function (that) { return that.execute_event.curryThis(that,"onclick") })(this), true));
-                this.setVar("listener_move", window.addEventListener("mousemove", (function (that) { return that.execute_event.curryThis(that,"onmove") })(this), true));
+                this.setVar("listener_click", this.engine.getEngineVar("#DOM").addEventListener("click", (function (that) { return that.execute_event.curryThis(that,"onclick") })(this), true));
+                this.setVar("listener_move", this.engine.getEngineVar("#DOM").addEventListener("mousemove", (function (that) { return that.execute_event.curryThis(that,"onmove") })(this), true));
             }
         },
         {
             name: "#exit", code: function (event) {
-                window.removeEventListener("click", this.getVar("listener_click"));
-                window.removeEventListener("mousemove", this.getVar("listener_move"));
+                this.engine.getEngineVar("#DOM").removeEventListener("click", this.getVar("listener_click"));
+                this.engine.getEngineVar("#DOM").removeEventListener("mousemove", this.getVar("listener_move"));
             }
         },
         {
-            name: "onclick", code: function (event) {
-                this.collision["point"][1].x = event.clientX;
-                this.collision["point"][1].y = event.clientY;
+            name: "onclick", code: function (e) {
+                this.collision["point"][1].x = e.offsetX==undefined?e.layerX:e.offsetX;
+                this.collision["point"][1].y = e.offsetY==undefined?e.layerY:e.offsetY;
                 this.setVar("timer", 1);
                 //Warning: This will only work if there is no scaling between the game coordinates and the canvas!
                 //If you are using a custom Spritesheet.js renderMode, you will need to do something like this:
@@ -31,9 +31,9 @@ var basicClickPreset = [
             }
         },
          {
-             name: "onmove", code: function (event) {
-                 this.collision["point"][0].x = event.clientX;
-                 this.collision["point"][0].y = event.clientY;
+             name: "onmove", code: function (e) {
+                 this.collision["point"][0].x = e.offsetX==undefined?e.layerX:e.offsetX;
+                 this.collision["point"][0].y = e.offsetY==undefined?e.layerY:e.offsetY;
                  //Warning: Read the previous warning
              }
          },

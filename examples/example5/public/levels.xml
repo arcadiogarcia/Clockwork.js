@@ -1,11 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <levels>
+   <level id="menu">
+    <object name="basicMouse" type="basicMouse" x="0" y="0" ></object>
+    <object name="someDog1" type="dog_menu1" x="60" y="50" ></object>
+    <object name="someDog2" type="dog_menu2" x="180" y="50" ></object>
+    <object name="someDog3" type="dog_menu3" x="300" y="50" ></object>
+    <object name="someDog4" type="dog_menu4" x="420" y="50" ></object>
+    <object name="someDog5" type="dog_menu5" x="560" y="50" ></object>
+    <object name="someDog6" type="dog_menu6" x="60" y="250" ></object>
+    <object name="someDog7" type="dog_menu7" x="180" y="250" ></object>
+    <object name="someDog8" type="dog_menu8" x="300" y="250" ></object>
+    <object name="someDog9" type="dog_menu9" x="420" y="250" ></object>
+    <object name="someDog10" type="dog_menu10" x="560" y="250" ></object>
+  </level>
   <level id="setup">
     <object name="socket" type="serverConnection" x="0" y="0" ></object>
   </level>
   <level id="demo">
     <object name="socket" type="serverEventHandler" x="0" y="0" ></object>
-    <object name="someDog1" type="dog" x="100" y="270" ></object>
+    <object name="dogSpawner" type="dogSpawner" x="0" y="0" ></object>
+    <object name="dogController" type="dogController" x="0" y="0" ></object>
     <object name="keyboard" type="keyboard" x="0" y="0" ></object>
+    <object name="basicMouse" type="basicMouse" x="0" y="0" ></object>
   </level>
 </levels>

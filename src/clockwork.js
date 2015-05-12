@@ -36,10 +36,6 @@ var Clockwork = (function () {
     //A reference to the loader
     clockwork.loader;
 
-    //The DOM element that "holds" the engine
-    //It will be used for input detection
-    var DOMholder;
-
     var debugMode = 1;
 
 
@@ -56,8 +52,8 @@ var Clockwork = (function () {
     this.start = function (newfps, DOMelement) {
         fps = newfps;
         started = true;
+        this.setEngineVar("#DOM",DOMelement);
         clockwork.loadLevel(0);
-        DOMholder = DOMelement;
     };
 
     /**
@@ -429,6 +425,25 @@ var Clockwork = (function () {
     //...................
 
     /**
+    * Loads an object when the level is already loaded
+    * @param {String} kind - The preset used
+    * @param {String} name - The name of the new object
+    * @returns The object
+    */
+    this.addObjectLive = function (name, kind,x,y,z,isStatic,timeTravels) {
+        var object = implementPreset(name, kind);
+        if (object.sprite != undefined) {
+           object.spriteholder = animationEngine.addObject(object.sprite, undefined, x||0, y||0, z||0, isStatic||false, timeTravels||false);
+        }
+        object.setVar("#x",x||0);
+        object.setVar("#y",y||0);
+        object.setVar("#z",z||0);
+        object.execute_event("#setup");
+        objects.push(object);
+        return object;
+    }
+
+    /**
     * Loads a level
     * @param {Number} n - The level number
     */
@@ -650,13 +665,14 @@ var Clockwork = (function () {
                                         bodyShape1.y += b1.getVar("#y");
                                         bodyShape2.x += b2.getVar("#x");
                                         bodyShape2.y += b2.getVar("#y");
+                                        var data={};
                                         //Check if they collide
-                                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2) == true) {
+                                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2,data) == true) {
                                             //Send the info to the #collide event handlers
-                                            if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l }) == "#exit") {
+                                            if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l ,data:data}) == "#exit") {
                                                 return "#exit";
                                             }
-                                            if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k }) == "#exit") {
+                                            if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k ,data:data}) == "#exit") {
                                                 return "#exit";
                                             }
                                         }

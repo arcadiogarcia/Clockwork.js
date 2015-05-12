@@ -7,6 +7,8 @@ var animationProxy = function (animationEngine,clockwork) {
 
     var sendStopSignal=[];
     
+    var objects={};
+    
     var time=0;
     
     animationInterface.tick = function (dt) {
@@ -15,6 +17,7 @@ var animationProxy = function (animationEngine,clockwork) {
 
     animationInterface.setX = function (id, value) {
         animationEngine.setX(id, value);
+        if(clockwork.getEngineVar("socket")){
         clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value,"time":time});
         sendStopSignal[id]=sendStopSignal[id]||{};
         sendStopSignal[id].x=value;
@@ -23,10 +26,12 @@ var animationProxy = function (animationEngine,clockwork) {
                 clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value,"time":time});
             }
         },50,id,sendStopSignal,value);
+        }
     };
 
     animationInterface.setY = function (id, value) {
         animationEngine.setY(id,value);
+        if(clockwork.getEngineVar("socket")){
         clockwork.getEngineVar("socket").emit('animation', {"action":"setY","id":id,"value":value,"time":time});
         sendStopSignal[id]=sendStopSignal[id]||{};
         sendStopSignal[id].y=value;
@@ -35,21 +40,31 @@ var animationProxy = function (animationEngine,clockwork) {
                 clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value,"time":time});
             }
         },50,id,sendStopSignal,value);
+        }
     };
 
     animationInterface.setZindex = function (id, value) {
         animationEngine.setZindex(id,value);
+        if(clockwork.getEngineVar("socket")){
         clockwork.getEngineVar("socket").emit('animation', {"action":"setZindex","id":id,"value":value});
+        }
     };
 
     animationInterface.setState = function (id, state) {
         animationEngine.setState(id,state);
+        if(clockwork.getEngineVar("socket")){
         clockwork.getEngineVar("socket").emit('animation', {"action":"setState","id":id,"state":state});
+        }
     };
 
     animationInterface.setParameter = function (id, parameter, value) {
         animationEngine.setParameter(id,parameter,value);
-        clockwork.getEngineVar("socket").emit('animation', {"action":"setParameter","parameter":parameter,"value":value});
+        if(clockwork.getEngineVar("socket")){
+             if(parameter=="$%stream%"&&value==true){
+        clockwork.getEngineVar("socket").emit('animation', objects[id]);
+        }
+        clockwork.getEngineVar("socket").emit('animation', {"action":"setParameter","parameter":parameter,"value":value,"id":id});
+        }
     };
 
     animationInterface.clear = function () {
@@ -62,13 +77,13 @@ var animationProxy = function (animationEngine,clockwork) {
     animationInterface.setCamera = function (x,y) {
         animationEngine.setCamera(x,y);
         if(clockwork.getEngineVar("socket")){
-            clockwork.getEngineVar("socket").emit('animation', {"action":"setCamera","x":x,"y":y});
+            //clockwork.getEngineVar("socket").emit('animation', {"action":"setCamera","x":x,"y":y});
         }
     };
 
     animationInterface.addObject = function (spritesheet, state, x, y, zindex, isstatic, doesnottimetravel) {
         var id= animationEngine.addObject(spritesheet, state, x, y, zindex, isstatic, doesnottimetravel);
-        clockwork.getEngineVar("socket").emit('animation', {
+        objects[id]={
             "id":id,
             "action":"addObject",
             "spritesheet":spritesheet,
@@ -78,13 +93,19 @@ var animationProxy = function (animationEngine,clockwork) {
             "zindex":zindex,
             "isstatic":isstatic,
             "doesnottimetravel":doesnottimetravel
-            });
+            };
             return id;
     };
 
     animationInterface.deleteObject = function (id) {
         animationEngine.deleteObject(id);
+        if(clockwork.getEngineVar("socket")){
         clockwork.getEngineVar("socket").emit('animation', {"action":"deleteObject","id":id});
+        }
+    };
+    
+    animationInterface.moveCameraX= function (x) {
+            animationEngine.moveCameraX(x);
     };
     
     var hashMapID ={};

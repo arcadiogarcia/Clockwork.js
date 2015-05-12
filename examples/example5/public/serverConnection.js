@@ -15,6 +15,9 @@ var serverConnection = [
                 var animationBuffer=[];
                 this.engine.setEngineVar("animationBuffer",animationBuffer);
                 this.engine.getEngineVar("socket").on('event', function(data){
+                    if(data.name[0]=="@"){
+                        data.name=data.name.substr(1);
+                    }
                         that.engine.execute_event(data.name, data.args);
                     });
                 this.engine.getEngineVar("socket").on('animation', function(data){
@@ -41,7 +44,7 @@ var serverConnection = [
                                 buffer.timeouts=[];
                                 var setter=function(data,vel,buffer){
                                     animationEngine.local[data.action](data.id,vel+buffer.actual);
-                                    console.log("add v:"+vel);
+
                                     buffer.actual+=vel;
                                 };
                                 var dt=(buffer.actualTime-buffer.lastTime);
