@@ -1,6 +1,17 @@
 ![Clockwork logo](https://github.com/arcadiogarcia/Clockwork.js/blob/master/assets/clockwork.png?raw=true)
 A lightweight modular JavaScript game engine
 
+##Demos
+
+[Example 1 - Paradogs](http://arcadiogarcia.github.io/Clockwork.js/examples/example1/example1.html)
+
+[Example 2 - Flappy dog](http://arcadiogarcia.github.io/Clockwork.js/examples/example2/example2.html)
+
+[Example 3 - Flappy dog advanced](http://arcadiogarcia.github.io/Clockwork.js/examples/example3/example3.html)
+
+[Example 4 - Flappy dog: DOMination](http://arcadiogarcia.github.io/Clockwork.js/examples/example4/example4.html)
+
+[Example 5 - Paradogs: The MMO](http://clockworkjs.azurewebsites.net/)
 
 ##FAQ
   - **Can I use this engine?**
@@ -148,7 +159,11 @@ Once you have written both the presets and the levels, you will be able to run y
 	The start method expects the fps and a DOM element that will be used for input (will register clicks, key presses...).
 
 
-##Examples
+##Known bugs
+
+There are no known bugs, if you find one please report it! (or even better, fix it yourself and submit a pull request).
+
+##Code examples
 
 Check out [examples/example1/example1.html](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example1/example1.html) to see how to instance the engine and create objects. You should also read [examples/example1/dogPreset.js](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example1/dogPreset.js) to see how to write presets, and [examples/example1/levels.xml](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example1/levels.xml) to see the levels structure.
 
@@ -161,10 +176,6 @@ Check out [examples/example4/DOManimation.js](https://github.com/arcadiogarcia/C
 Check out [examples/example5s](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example5) to see how to run  a instance of the game engine on a Node.js server to create multiplayer games easily (using Socket.io).
 
 If you are interested in the animation and rendering, you should learn more about [Spritesheet.js](https://github.com/arcadiogarcia/Spritesheet.js), the 2D animation library specifically developed to be used with Clockwork.js. You can find the spritesheets used by the examples in [examples/shared](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/shared). Thanks to [Silvia Barbero](http://silvishinystar.deviantart.com/) for allowing me to use her dog sprite!
-
-##Known bugs
-
-There are no known bugs, if you find one please report it! (or even better, fix it yourself and submit a pull request).
 
 ##Roadmap
 
