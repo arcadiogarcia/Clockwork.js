@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<levels>
+  <level id="menu">
+    <object name="someBG" type="static_background" x="0" y="0" ></object>
+    <object name="someButton" type="button" x="300" y="250" ></object>
+    <object name="someMouse" type="basicMouse" x="0" y="0" ></object>
+  </level>
+  <level id="game">
+    <object name="someBG" type="background" x="0" y="0" ></object>
+    <object name="somePipe" type="pipe" x="200" y="265" ></object>
+    <object name="somePipe2" type="pipe_reverse" x="200" y="-165" ></object>
+    <object name="someDog" type="dog" x="0" y="100" ></object>
+    <object name="someMouse" type="basicMouse" x="0" y="0" ></object>
+  </level>
+</levels>

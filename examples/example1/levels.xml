@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<levels>
+  <level id="demo">
+    <object name="someDog1" type="dog" x="100" y="100" ></object>
+    <object name="someDog2" type="dog" x="200" y="100" ></object>
+    <object name="someDog3" type="dog" x="300" y="100" ></object>
+    <object name="someDog4" type="dog" x="400" y="100" ></object>
+    <object name="someDog5" type="dog" x="500" y="100" ></object>
+    <object name="someMouse" type="basicMouse" x="0" y="0" ></object>
+  </level>
+</levels>

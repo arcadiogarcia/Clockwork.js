@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="gamePresets.js"></script>
+    <script src="DOManimation.js"></script>
+    <script src="../../src/Clockwork.js"></script>
+    <script src="../../src/collisions/pointsAndBoxes.js"></script>
+    <script src="../../src/presets/basicMouse.js"></script>
+    <script src="../../src/presets/storage.js"></script>
+    <script src="../shared/spritesheet.js"></script>
+</head>
+<body style="background-color:#000;">
+    <script>
+
+        //This is just the same as example3, but using DOManimation.js for the rendering
+
+
+
+            var engineInstance = new Clockwork();
+            engineInstance.setAnimationEngine(new DOManimation());
+            engineInstance.registerCollision(ClockworkCollisions.pointsAndBoxes);
+            engineInstance.loadPresets(basicClickPreset);
+            engineInstance.loadPresets(storage);
+            engineInstance.loadPresets(gamePresets);
+            engineInstance.loadLevelsFromXML("levels.xml", function () {
+                engineInstance.start(60, document.body);
+            });
+    </script>
+</body>
+</html>

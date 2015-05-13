@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Paradogs - The amazing MMO</title>
+    
+    <!--This has to be included for the sever connection-->
+     
+    <script src="socket.io/socket.io.js"></script>
+        
+    <script src="animationProxy.js"></script>
+    <script src="serverConnection.js"></script>
+   
+    <!--End server requirements-->
+    
+    <script src="dogPreset.js"></script>
+    <script src="Clockwork.js"></script>
+    <script src="pointsAndBoxes.js"></script>
+    <script src="basicMouse.js"></script>
+    <script src="keyboard.js"></script>
+    <script src="spritesheet.js"></script>
+</head>
+<body style="background-color:#000;">
+    <canvas id="canvas" width="800" height="400" style="background-color:#000;position:absolute;display:block;top:50%;left:50%;margin-top:-200px;margin-left:-400px;"></canvas>
+    <script>
+        //First we set up a Spritesheet.js instance to render the scene
+        //Learn more about Spritesheet.js at https://github.com/arcadiogarcia/Spritesheet.js/
+
+        var canvasAnimation = new Spritesheet();
+        canvasAnimation.setUp(document.getElementById("canvas"), 30);
+        canvasAnimation.setBufferSize(800, 400);
+        canvasAnimation.asyncLoad("spritesheet_paradog.xml", callback_load);
+
+        var engineInstance;
+        //This function is executed after Spritesheet.js loads
+        function callback_load() {
+            //This is where Clockwork.js starts
+            engineInstance = new Clockwork();
+            engineInstance.setAnimationEngine(animationProxy(canvasAnimation,engineInstance));
+            engineInstance.registerCollision(ClockworkCollisions.pointsAndBoxes);
+            engineInstance.loadPresets(basicClickPreset);
+            engineInstance.loadPresets(dog);
+            engineInstance.loadPresets(serverConnection);
+            engineInstance.loadPresets(keyboard);
+            engineInstance.loadLevelsFromXML("levels.xml", function () {
+                engineInstance.start(30, document.getElementById("canvas"));
+            });
+        }
+    </script>
+</body>
+</html>
