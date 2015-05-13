@@ -45,6 +45,7 @@ var gamePresets = [
 		        } else {
 		            if (this.getVar("#y") > 420) {
 		                this.engine.loadLevelByID("menu");
+                        return "#exit";
 		            }
 		        }
                 if (this.getVar("vy")<5) {

@@ -26,7 +26,7 @@
             engineInstance.loadPresets(storage);
             engineInstance.loadPresets(gamePresets);
             engineInstance.loadLevelsFromXML("levels.xml", function () {
-                engineInstance.start(60, document);
+                engineInstance.start(60, document.body);
             });
     </script>
 </body>

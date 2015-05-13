@@ -45,6 +45,7 @@ var gamePresets = [
 		        } else {
 		            if (this.getVar("#y") > 420) {
 		                this.engine.loadLevelByID("menu");
+                        return "#exit";
 		            }
 		        }
                 if (this.getVar("vy")<5) {
@@ -181,7 +182,7 @@ var gamePresets = [
     ],
     collision: {
         "box": [
-            { "x": 0, "y": 0, "w": 200, "h": 200 },
+            { "x": 0, "y": 0, "w": 200, "h": 100 },
         ]
     }
 },
