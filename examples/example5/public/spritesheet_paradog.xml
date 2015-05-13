@@ -1190,7 +1190,7 @@
       </state>
      </states>
      <layers>
-       <layer name="text" x="55" y="-60">
+       <layer name="text" x="0" y="0">
         <frame name="text"></frame>
       </layer>
     </layers>

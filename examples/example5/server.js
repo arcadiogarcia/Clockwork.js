@@ -30,10 +30,11 @@ io.on('connection', function(socket){
         socket.emit('animation', pendingAnimation[i].message);
     }
     for(var i=0;i<pendingEvents.length;i++){
-        socket.emit('animation', pendingEvents[i].message);
+        socket.emit('event', pendingEvents[i].message);
     }
     socket.on('event', function (data) { 
         data.args.id=socket.id;
+        console.log(data);
         if(data.args["%keep%"]==true){
             pendingEvents.push({owner:socket.id,message:data});
         }
@@ -95,7 +96,7 @@ setInterval(function(){
      for(var i=0;i<pendingAnimation.length;i++){
         io.sockets.emit('animation', pendingAnimation[i].message);
     }
-},1000);
+},100000);
 
 
 //Clockwork engine

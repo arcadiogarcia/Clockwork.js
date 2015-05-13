@@ -4,6 +4,8 @@
 var animationProxy = function (animationEngine,clockwork) {
 
     var animationInterface = {};
+    
+    var lastactions={setX:{},setY:{},setState:{},setZindex:{},setParameter:{}};
 
     var sendStopSignal=[];
     
@@ -11,13 +13,16 @@ var animationProxy = function (animationEngine,clockwork) {
     
     var time=0;
     
+    var syncObjects={};
+    
     animationInterface.tick = function (dt) {
         time += dt;   
     };
 
     animationInterface.setX = function (id, value) {
         animationEngine.setX(id, value);
-        if(clockwork.getEngineVar("socket")){
+        if(clockwork.getEngineVar("socket")&&syncObjects[id]==true&&lastactions.setX[id]!=value){
+        lastactions.setX[id]=value;
         clockwork.getEngineVar("socket").emit('animation', {"action":"setX","id":id,"value":value,"time":time});
         sendStopSignal[id]=sendStopSignal[id]||{};
         sendStopSignal[id].x=value;
@@ -31,7 +36,8 @@ var animationProxy = function (animationEngine,clockwork) {
 
     animationInterface.setY = function (id, value) {
         animationEngine.setY(id,value);
-        if(clockwork.getEngineVar("socket")){
+        if(clockwork.getEngineVar("socket")&&syncObjects[id]==true&& lastactions.setY[id]!=value){
+        lastactions.setY[id]=value;
         clockwork.getEngineVar("socket").emit('animation', {"action":"setY","id":id,"value":value,"time":time});
         sendStopSignal[id]=sendStopSignal[id]||{};
         sendStopSignal[id].y=value;
@@ -45,22 +51,26 @@ var animationProxy = function (animationEngine,clockwork) {
 
     animationInterface.setZindex = function (id, value) {
         animationEngine.setZindex(id,value);
-        if(clockwork.getEngineVar("socket")){
+        if(clockwork.getEngineVar("socket")&&syncObjects[id]==true&&lastactions.setZindex[id]!=value){
+             lastactions.setZindex[id]=value;
         clockwork.getEngineVar("socket").emit('animation', {"action":"setZindex","id":id,"value":value});
         }
     };
 
     animationInterface.setState = function (id, state) {
         animationEngine.setState(id,state);
-        if(clockwork.getEngineVar("socket")){
+        if(clockwork.getEngineVar("socket")&&syncObjects[id]==true&&lastactions.setState[id]!=value){
+             lastactions.setState[id]=value;
         clockwork.getEngineVar("socket").emit('animation', {"action":"setState","id":id,"state":state});
         }
     };
 
     animationInterface.setParameter = function (id, parameter, value) {
         animationEngine.setParameter(id,parameter,value);
-        if(clockwork.getEngineVar("socket")){
+        if(clockwork.getEngineVar("socket")&&syncObjects[id]==true&&lastactions.setParameter[id+"."+parameter]!=value){
+             lastactions.setParameter[id+"."+parameter]=value;
              if(parameter=="$%stream%"&&value==true){
+                 syncObjects[id]=true;
         clockwork.getEngineVar("socket").emit('animation', objects[id]);
         }
         clockwork.getEngineVar("socket").emit('animation', {"action":"setParameter","parameter":parameter,"value":value,"id":id});
@@ -99,7 +109,7 @@ var animationProxy = function (animationEngine,clockwork) {
 
     animationInterface.deleteObject = function (id) {
         animationEngine.deleteObject(id);
-        if(clockwork.getEngineVar("socket")){
+        if(clockwork.getEngineVar("socket")&&syncObjects[id]==true){
         clockwork.getEngineVar("socket").emit('animation', {"action":"deleteObject","id":id});
         }
     };

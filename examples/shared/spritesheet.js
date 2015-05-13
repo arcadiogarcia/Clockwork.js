@@ -79,9 +79,10 @@ var Spritesheet = (function () {
         //First we clear the context
         context.clearRect(0, 0, canvas.width, canvas.height);
         //For each object
-        for (var i = 0; i < objects.length; i++) {
+        for (var i = 0; i < objectsorder.length; i++) {
             //We get the object in that position acoording to the zindex
             var object = objects[objectsorder[i].v];
+          
             //We get its spritesheet
             var spritesheet = searchWhere(spritesheets, "name", object.spritesheet);
             var state = spritesheet.states[0];
@@ -176,9 +177,32 @@ var Spritesheet = (function () {
                     if (!skip) {
                         context.drawImage(spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
                     }
+                    
+                    //If we flipped before then we restore everything
+                    switch (state.flip) {
+                             case 1:
+                             case 2:
+                             case 3:
+                                context.restore();
+                             break;
+                             default:
+                              break;
+                    }
                 } else {
+                     //Code shouldnt flip?
+                     switch (state.flip) {
+                             case 1:
+                             case 2:
+                             case 3:
+                                context.restore();
+                             break;
+                             default:
+                              break;
+                     }
+                    
                     //If it is a 'custom' frame, we execute the code
-                    frame.code((+layer.x(object.t)) + (+object.x), (+layer.y(object.t)) + (+object.y), object.t, context, object.vars);
+                    frame.code(xposition, yposition, object.t, context, object.vars);
+                    
                 }
 
                 //If we flipped before then we restore everything
@@ -308,10 +332,10 @@ var Spritesheet = (function () {
         objectsorder = [];
         for (var i = 0; i < objects.length; i++) {
             if (objects[i] != null) {
-                objectsorder[i] = { v: i, z: objects[i].zindex };
+                objectsorder.push({ v: i, z: objects[i].zindex });
             }
         }
-        objectsorder.sort(function (a, b) { return a.z - b.z });
+        objectsorder.sort(function (a, b) { return a.z - b.z; });
     }
 
     //This functions are public and are the only ones that should be used to control the engine
@@ -406,6 +430,7 @@ var Spritesheet = (function () {
         */
         deleteObject: function (id) {
             objects[id] = null;
+            sortZindex();
         },
         /**Remove all the objects
         */

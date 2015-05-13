@@ -16,25 +16,43 @@ var dog = [
                 var dog=this.engine.addObjectLive("remoteDog"+event.id,"dogRemote" + event.skin,event.x,240);
                 dog.setVar("id",event.id);
                 dog.setVar("$text",event.name);
+             
+            }
+        },
+        {
+            name: "incomingBark", code: function (event) {
+                this.engine.execute_event("newmessage");
+                var chat=this.engine.addObjectLive("someChatBox","chatBox",event.x,140);
+                chat.setVar("$text",event.text);
+                chat.setVar("$color",event.color);
             }
         }
     ]
 },
 {
-    name: "chatText",
+    name: "chatBox",
     sprite: "text",
     events: [
         {
             name: "#setup", code: function (event) {
                 this.setVar("timer", 0);
+                this.setVar("ytarget", this.getVar("#y"));
             }
         },
          {
             name: "#loop", code: function (event) {
+                if(this.getVar("ytarget")<this.getVar("#y")){
+                    this.setVar("#y",this.getVar("#y")-2);
+                }
                 this.setVar("timer", this.getVar("timer")+1);
                 if(this.getVar("timer")>700){
                     
                 }
+            }
+        },
+         {
+            name: "newmessage", code: function (event) {
+                    this.setVar("ytarget",this.getVar("ytarget")-20);
             }
         }
     ]
@@ -46,16 +64,34 @@ var dog = [
             name: "#collide", code: function (event) {
                 if (event.shape2kind == "point" && this.engine.getObject(event.object).instanceOf("basicMouse")) {
 					if(event.shape2id == 1){
-                       this.engine.find("playerDog").execute_event("setGoingTo",event.data.x*800-400);
-                       this.engine.execute_event("@moveDog", {x:event.data.x*800-400});
+                        if(event.shape1id == 1){
+                            this.engine.execute_event("bark");
+                            this.setVar("bark",true);
+                            this.setVar("moveCounter",undefined);
+                        }else if(event.shape1id == 0){
+                            this.setVar("move",event.data.x);
+                            this.setVar("moveCounter",2);
+                        }
 					}
                 }
+            }
+        },
+         {
+            name: "#loop", code: function (event) {
+                this.setVar("moveCounter",this.getVar("moveCounter")-1);
+                if(this.getVar("moveCounter")==0&&!this.getVar("bark")){
+                    this.engine.find("playerDog").execute_event("setGoingTo",this.getVar("move")*800-400);
+                    this.engine.execute_event("@moveDog", {x:this.getVar("move")*800-400});
+                    this.setVar("moveCounter",undefined);
+                }
+                this.setVar("bark",false);
             }
         },
     ],
     collision: {
         "box": [
             { "x": 0, "y": -0, "w": 800, "h": 400 },
+            { "x": 355, "y": 270, "w": 120, "h": 120 },
         ]
     }
 },
@@ -79,8 +115,59 @@ var dog = [
                 this.setVar("goingto", event+this.getVar("#x")-55);
             }
         },
+         {
+            name: "bark", code: function (event) {
+                        if(this.getVar("timer")==0){
+                        var name=window.prompt("Write a message","Bark!");
+                        if(name!=null){
+                            var color="#FFF";
+                            switch(this.engine.getEngineVar("dogSkin")){
+                                case 1:
+                                color="#d09d3a";
+                                break;
+                                case 2:
+                                color="#aa785f";
+                                break;
+                                case 3:
+                                color="#768993";
+                                break;
+                                case 4:
+                                color="#fff";
+                                break;
+                                case 5:
+                                color="#959595";
+                                break;
+                                case 6:
+                                color="#43434a";
+                                break;
+                                case 7:
+                                color="#6c9d80";
+                                break;
+                                case 8:
+                                color="#d68ac6";
+                                break;
+                                case 9:
+                                color="#bfe0ff";
+                                break;
+                                case 10:
+                                color="#b3aa56";
+                                break;
+                            }
+                             this.engine.execute_event("newmessage");
+                            var chat=this.engine.addObjectLive("someChatBox","chatBox",this.getVar("#x")+55,this.getVar("#y")-100);
+                            chat.setVar("$text",name);
+                            chat.setVar("$color",color);
+                            this.engine.execute_event("@incomingBark", {x:this.getVar("#x")+55,text:name,color:color});
+						this.setVar("#state", "Bark"+this.getVar("lookto"));
+						this.setVar("timer", 30);
+                        }
+                        }
+            }
+        
+         },
 		{
             name: "#loop", code: function (event) {
+                if(this.getVar("timer")==0){
                  var gt=this.getVar("goingto");
                  var x=this.getVar("#x");
                  if(gt > x+6){
@@ -96,10 +183,14 @@ var dog = [
                  }else{
                      this.setVar("#state", "Idle"+this.getVar("lookto"));
                  }
+                }else{
+                    this.setVar("timer",this.getVar("timer")-1);
+                }
                
             }
         }
-    ]
+    ],
+
     
 },
 
