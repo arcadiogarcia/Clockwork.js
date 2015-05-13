@@ -6,8 +6,8 @@ var basicClickPreset = [
     events: [
         {
             name: "#setup", code: function (event) {
-                this.setVar("listener_click", this.engine.getEngineVar("#DOM").addEventListener("click", (function (that) { return that.execute_event.curryThis(that,"onclick") })(this), true));
-                this.setVar("listener_move", this.engine.getEngineVar("#DOM").addEventListener("mousemove", (function (that) { return that.execute_event.curryThis(that,"onmove") })(this), true));
+                this.setVar("listener_click", this.engine.getEngineVar("#DOM").addEventListener("click", (function (that) { return that.execute_event.curryThis(that,"onclick") })(this), false));
+                this.setVar("listener_move", this.engine.getEngineVar("#DOM").addEventListener("mousemove", (function (that) { return that.execute_event.curryThis(that,"onmove") })(this), false));
             }
         },
         {
@@ -18,8 +18,12 @@ var basicClickPreset = [
         },
         {
             name: "onclick", code: function (e) {
-                this.collision["point"][1].x = e.offsetX==undefined?e.layerX:e.offsetX;
+                this.collision["point"][1].x = (e.offsetX==undefined?e.layerX:e.offsetX);
                 this.collision["point"][1].y = e.offsetY==undefined?e.layerY:e.offsetY;
+                if(e.target!=e.currentTarget){
+                    this.collision["point"][1].x += e.target.offsetLeft;
+                    this.collision["point"][1].y += e.target.offsetTop;
+                }
                 this.setVar("timer", 1);
                 //Warning: This will only work if there is no scaling between the game coordinates and the canvas!
                 //If you are using a custom Spritesheet.js renderMode, you will need to do something like this:
