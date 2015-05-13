@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Clockwork.js by arcadiogarcia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Clockwork.js</h1>
+      <h2 class="project-tagline">A lightweight modular JavaScript game engine</h2>
+      <a href="https://github.com/arcadiogarcia/Clockwork.js" class="btn">View on GitHub</a>
+      <a href="https://github.com/arcadiogarcia/Clockwork.js/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/arcadiogarcia/Clockwork.js/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p><img src="https://github.com/arcadiogarcia/Clockwork.js/blob/master/assets/clockwork.png?raw=true" alt="Clockwork logo"></p>
+
+<h2>
+<a id="demos" class="anchor" href="#demos" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demos</h2>
+
+<p><a href="http://arcadiogarcia.github.io/Clockwork.js/examples/example1/example1.html">Example 1 - Paradogs</a></p>
+
+<p><a href="http://arcadiogarcia.github.io/Clockwork.js/examples/example2/example2.html">Example 2 - Flappy dog</a></p>
+
+<p><a href="http://arcadiogarcia.github.io/Clockwork.js/examples/example3/example3.html">Example 3 - Flappy dog advanced</a></p>
+
+<p><a href="http://arcadiogarcia.github.io/Clockwork.js/examples/example4/example4.html">Example 4 - Flappy dog: DOMination</a></p>
+
+<p><a href="http://clockworkjs.azurewebsites.net/">Example 5 - Paradogs: The MMO</a></p>
+
+<h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
+
+<ul>
+<li>
+<p><strong>Can I use this engine?</strong></p>
+
+<p>If you are developing a game (or a game-like app or website) in JavaScript, you can use Clockwork.js!</p>
+</li>
+<li>
+<p><strong>Should I use this engine?</strong></p>
+
+<p>If you want to keep your code organized and modular, forget about the big picture and focus on implementing your game behaviour, you should use this engine.</p>
+
+<p>If you want a game engine that makes easy to start coding, but you also want to be able to extend the engine to fit your needs, you should use this engine.</p>
+
+<p>If you have no experience in videogame development, and want  to learn to write games step by step, you should use this engine.</p>
+
+<p>BUT</p>
+
+<p>If you are searching for a engine that does everything for you (physics, app packaging...) and lets you build a game with very little coding, you shouldn't use this engine.</p>
+</li>
+<li>
+<p><strong>What does this engine do?</strong></p>
+
+<p>This engine is focused mainly in allowing to implement the game logic using events and event handlers, define presets (think of them as classes) that can be easily instantiated in levels, and use a modular engine so common elements (as input handlers, menu elements or even enemies) can be shared across games.
+This engine does not provide any functionality related to</p>
+</li>
+<li>
+<p><strong>How do I use this engine?</strong></p>
+
+<p>Great, if you are still reading this it seems that you are interested in using the engine. To use the engine, you just need to follow the steps described in the <em>Get Started</em> section.</p>
+</li>
+<li>
+<p><strong>Can I use this engine for 3D games?</strong></p>
+
+<p>Yes you can! All the examples provided are 2D because they use <a href="https://github.com/arcadiogarcia/Spritesheet.js">Spritesheet.js</a>, a 2D rendering library, but you should be able to use any 3D (or 2D) library (or write your own) if write a wrapper (stay tuned for more info about this).</p>
+</li>
+<li>
+<p><strong>I have written a nice preset that I want to share, may I add it to the collection included in the src/presets folder</strong></p>
+
+<p>Of course! It doesn't mind if it implements a game element (e.g. a progress bar), or is a wrapper to use a specific [Windows10/ApacheCordova/FirefoxOS/Web/whatever] feature, you are welcome to add it to the library collection.</p>
+</li>
+<li>
+<p><strong>Can I use [Some library] for the animation?</strong></p>
+
+<p>Yes, you will only have to write a wrapper, more info about that soon.</p>
+</li>
+<li>
+<p><strong>Can I make a multiplayer game?</strong></p>
+
+<p>Since the Clockwork.js is event based, it is very easy to communicate many engine instances. There is a general-purpose  implementation already written in examples/example5, that can be adapted to fit your specific needs.</p>
+</li>
+</ul>
+
+<h2>
+<a id="get-started" class="anchor" href="#get-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get started</h2>
+
+<p>The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> somePresets <span class="pl-k">=</span> [
+{
+    name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someName<span class="pl-pds">"</span></span>,
+    inherits<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someOtherPreset<span class="pl-pds">"</span></span>,
+    sprite<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someSprite<span class="pl-pds">"</span></span>,
+    events<span class="pl-k">:</span> [
+        {
+            name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someEvent<span class="pl-pds">"</span></span>, <span class="pl-en">code</span>: <span class="pl-k">function</span> (<span class="pl-smi">event</span>) {
+                <span class="pl-c">//TODO</span>
+            }
+        },
+        ...
+    ],
+    collision<span class="pl-k">:</span> {
+        <span class="pl-s"><span class="pl-pds">"</span>someKindOfShape<span class="pl-pds">"</span></span><span class="pl-k">:</span> [
+            { <span class="pl-s"><span class="pl-pds">"</span>x<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">"</span>y<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>, ... },
+            ...
+        ],
+        ...
+    },
+    vars<span class="pl-k">:</span> [
+    { name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someVariable<span class="pl-pds">"</span></span>, value<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    ...
+    ]
+},
+...
+]</pre></div>
+
+<p>As you can see, you can specify many properties of the preset, but only the name is mandatory:</p>
+
+<ul>
+<li>
+<em>name</em> : Specifies the preset name, it must be unique.</li>
+<li>
+<em>inherits</em> : You can specify a preset from which the actual one will inherit the event handlers, sprite, collision shapes and variables (but they can be overwritten if you want to change them).</li>
+<li>
+<em>sprite</em> : Specifies the spritesheet used to draw the object in the screen.</li>
+<li>
+<em>events</em> : The event handlers will contain all the logic of your game. They are functions that will be executed when some event happens, they may accept parameters inside the event object and may also return something.
+Event names beggining with # are reserved for the engine:</li>
+</ul>
+
+<pre><code>- #setup is executed when a level is loaded
+- #loop is executed each frame
+- #collide is executed when a collision is detected
+</code></pre>
+
+<p>You can use any other name to handle other events (input, inter-object interaction...).</p>
+
+<ul>
+<li>
+<em>collision</em> : Specifies the shapes that will act as hitboxes. They is an array of each category of shape, and you can define your own custom shapes (we'll get to that later).</li>
+<li>
+<em>vars</em> : Any variable that the object may need. You can also set them in the code, but if you define them here you can easily inherit and modify    the values.</li>
+</ul>
+
+<p>Then, you should write the levels .xml, which specify when and where will be the objects instantiated:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">levels</span>&gt;
+  &lt;<span class="pl-ent">level</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>someName<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">object</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>someName<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>somePreset<span class="pl-pds">"</span></span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span> <span class="pl-e">z</span>=<span class="pl-s"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span> <span class="pl-e">vars</span>=<span class="pl-s"><span class="pl-pds">'</span>{"w":90}<span class="pl-pds">'</span></span>&gt;&lt;/<span class="pl-ent">object</span>&gt;
+    ...
+  &lt;/<span class="pl-ent">level</span>&gt;
+  ...
+&lt;/<span class="pl-ent">levels</span>&gt;</pre></div>
+
+<p>You can specify as many levels as you want, and they must have unique names.
+When you load a level, all the objects that it contains will be instantiated:</p>
+
+<ul>
+<li>
+<em>name</em> : Specifies a unique name for the object that will allow you to reference it from other objects.</li>
+<li>
+<em>type</em> : Specifies the preset used to create the object.</li>
+<li>
+<em>x</em>, <em>y</em>, <em>z</em>: Specify the coordinates of the object. Z is not mandatory, but recomended even in 2d games to control the order in which objects are drawn.</li>
+<li>
+<em>vars</em> : They will be added or overwrite the preset variables.</li>
+</ul>
+
+<p>Once you have written both the presets and the levels, you will be able to run your game:</p>
+
+<ol>
+<li>
+<p>First of all, include the engine and the file with your presets:</p>
+
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>Clockwork.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>myPresets.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+</li>
+<li>
+<p>Instantiate the Clockwork engine:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> engineInstance <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Clockwork</span>();</pre></div>
+</li>
+<li>
+<p>Specify which animation library will you use. For 2D games, we recomend you to use <a href="https://github.com/arcadiogarcia/Spritesheet.js">Spritesheet.js</a>, which specifically was developed to be used with Clockwork.js. The library will handle all the rendering and the loading of the spritesheets, Clockwork.js will only tell the library what to draw.</p>
+
+<div class="highlight highlight-javascript"><pre>engineInstance.setAnimationEngine(canvasAnimation);</pre></div>
+</li>
+<li>
+<p>Load as many presets you neeed.</p>
+
+<div class="highlight highlight-javascript"><pre>engineInstance.loadPresets(somePresets);
+engineInstance.loadPresets(otherPresets);</pre></div>
+</li>
+<li>
+<p>Load the levels and use the callback to start the engine.</p>
+
+<div class="highlight highlight-javascript"><pre>engineInstance.loadLevelsFromXML(<span class="pl-s"><span class="pl-pds">"</span>levels.xml<span class="pl-pds">"</span></span>, <span class="pl-k">function</span> () {
+            engineInstance.<span class="pl-c1">start</span>(<span class="pl-c1">30</span>, <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">"</span>canvas<span class="pl-pds">"</span></span>));
+});  </pre></div>
+
+<p>The start method expects the fps and a DOM element that will be used for input (will register clicks, key presses...).</p>
+</li>
+</ol>
+
+<h2>
+<a id="known-bugs" class="anchor" href="#known-bugs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known bugs</h2>
+
+<p>There are no known bugs, if you find one please report it! (or even better, fix it yourself and submit a pull request).</p>
+
+<h2>
+<a id="code-examples" class="anchor" href="#code-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code examples</h2>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example1/example1.html">examples/example1/example1.html</a> to see how to instance the engine and create objects. You should also read <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example1/dogPreset.js">examples/example1/dogPreset.js</a> to see how to write presets, and <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example1/levels.xml">examples/example1/levels.xml</a> to see the levels structure.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example2/gamePresets.js">examples/example2/gamePresets.js</a> to learn to write the presets needed for a basic game.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example3/gamePresets.js">examples/example3/gamePresets.js</a> to see how to add more advanced features to the previous game.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example4/DOManimation.js">examples/example4/DOManimation.js</a> to see how to write your own animation library.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example5">examples/example5s</a> to see how to run  a instance of the game engine on a Node.js server to create multiplayer games easily (using Socket.io).</p>
+
+<p>If you are interested in the animation and rendering, you should learn more about <a href="https://github.com/arcadiogarcia/Spritesheet.js">Spritesheet.js</a>, the 2D animation library specifically developed to be used with Clockwork.js. You can find the spritesheets used by the examples in <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/shared">examples/shared</a>. Thanks to <a href="http://silvishinystar.deviantart.com/">Silvia Barbero</a> for allowing me to use her dog sprite!</p>
+
+<h2>
+<a id="roadmap" class="anchor" href="#roadmap" aria-hidden="true"><span class="octicon octicon-link"></span></a>Roadmap</h2>
+
+<p>These items are on the roadmap:</p>
+
+<ul>
+<li><p><strong>Animation library sample wrapper</strong>
+<del>Provide an example of the methods that the animation library used must implement.</del> <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example4/DOManimation.js">examples/example4/DOManimation.js</a> shows how to write a simple animation library, and you can find more exaples in src/animation.</p></li>
+<li><p><strong>Editor</strong>:
+Develop a drag and drop editor to create levels more easily.</p></li>
+<li><p><strong>More presets</strong>
+Write presets to handle other input methods: keyboard, pointers, accelerometer...
+Also, write platform specific presets (e.g. notifications, live tiles for Windows).</p></li>
+<li><p><strong>More collision detectors</strong>
+Add support for more complex (e.g. concave) shapes.</p></li>
+</ul>
+
+<h2>
+<a id="contact" class="anchor" href="#contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact</h2>
+
+<p>You can contact the creator of the engine at <a href="http://www.twitter.com/arcadio_g_s">@arcadio_g_s</a> on Twitter.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/arcadiogarcia/Clockwork.js">Clockwork.js</a> is maintained by <a href="https://github.com/arcadiogarcia">arcadiogarcia</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
