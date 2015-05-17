@@ -11,7 +11,7 @@ A lightweight modular JavaScript game engine
 
 [Example 4 - Flappy dog: DOMination](http://arcadiogarcia.github.io/Clockwork.js/examples/example4/example4.html)
 
-[Example 5 - Paradogs: The MMO](http://clockworkjs.azurewebsites.net/)
+[Example 5 - Paradogs: The MMO](http://clockworkjsdemo1.azurewebsites.net/)
 
 ##FAQ
   - **Can I use this engine?**
