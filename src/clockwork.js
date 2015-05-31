@@ -663,8 +663,10 @@ var Clockwork = (function () {
                                         var bodyShape2 = b2.collision[shape2][l];
                                         bodyShape1.x += b1.getVar("#x");
                                         bodyShape1.y += b1.getVar("#y");
+                                        bodyShape1.z += b1.getVar("#z");
                                         bodyShape2.x += b2.getVar("#x");
                                         bodyShape2.y += b2.getVar("#y");
+                                        bodyShape2.z += b2.getVar("#z");
                                         var data = {};
                                         //Check if they collide
                                         if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2, data) == true) {
@@ -678,8 +680,10 @@ var Clockwork = (function () {
                                         }
                                         bodyShape1.x -= b1.getVar("#x");
                                         bodyShape1.y -= b1.getVar("#y");
+                                        bodyShape1.z -= b1.getVar("#z");
                                         bodyShape2.x -= b2.getVar("#x");
                                         bodyShape2.y -= b2.getVar("#y");
+                                        bodyShape2.z -= b2.getVar("#z");
                                     }
                                 }
                             }
