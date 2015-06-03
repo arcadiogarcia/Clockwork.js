@@ -8,8 +8,8 @@ var Clockwork = (function () {
     var clockwork = this;
     //The list of presets loaded
     var presets = {};
-    //The objects in the current level
-    var objects = {};
+    //The array of objects in the current level
+    var objects = [];
     //The engine global variables
     var globalvars = {};
 
@@ -461,7 +461,7 @@ var Clockwork = (function () {
     */
     this.loadLevel = function (n) {
         currentLevel = n;
-        for (var j in objects) {
+        for (var j = 0; j < objects.length;j++) {
             objects[j].execute_event("#exit", []);
         }
         clockwork.setEngineVar("#currentlevel", n);
@@ -613,7 +613,7 @@ var Clockwork = (function () {
 */
 
     this.execute_event = function (name, e_args) {
-        for (var i in objects) {
+        for (var i = 0; i < objects.length; i++) {
             var body = objects[i];
             if (body.execute_event("#", { "name": name, "args": e_args }) == "#exit") {
                 return "#exit";
