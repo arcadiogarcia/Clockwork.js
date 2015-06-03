@@ -33,6 +33,18 @@ var Clockwork = (function () {
     collisions.shapes = [];
     collisions.detect = {};
 
+    //The algorithm used to when detecting the collisions
+    var collisionAlgorithm = function (objects, calculate) {
+        for (var i = 0; i < objects.length; i++) {
+            for (var j = 0; j < objects.length; j++) {
+                if (i != j) {
+                    calculate(i,j);
+                }
+            }
+        }
+
+    };
+
     //A reference to the loader
     clockwork.loader;
 
@@ -52,7 +64,7 @@ var Clockwork = (function () {
     this.start = function (newfps, DOMelement) {
         fps = newfps;
         started = true;
-        this.setEngineVar("#DOM",DOMelement);
+        this.setEngineVar("#DOM", DOMelement);
         clockwork.loadLevel(0);
     };
 
@@ -105,7 +117,7 @@ var Clockwork = (function () {
 *@param {Object} variable - The object name
 */
     this.find = function (variable) {
-        return searchWhereDeep(objects, ["vars","name"], variable);
+        return searchWhereDeep(objects, ["vars", "name"], variable);
     };
 
     /**
@@ -117,10 +129,10 @@ var Clockwork = (function () {
     };
 
 
-  /**
-*Gets the animation engine
-*@return {Object} engine - The animation engine
-*/
+    /**
+  *Gets the animation engine
+  *@return {Object} engine - The animation engine
+  */
     this.getAnimationEngine = function () {
         return animationEngine;
     };
@@ -174,7 +186,7 @@ var Clockwork = (function () {
 
     function searchWhereDeep(array, keys, value) {
         for (var i = 0; i < array.length; i++) {
-            var object=array[i];
+            var object = array[i];
             for (var j = 0; j < keys.length; j++) {
                 object = object[keys[j]];
             }
@@ -353,7 +365,7 @@ var Clockwork = (function () {
     function addPresetHandler(name, event, somefunction) {
         presets[name].eventfunction[event] = somefunction;
     }
-    
+
 
     function addPresetVar(name, variable, value) {
         presets[name].vars[variable] = value;
@@ -430,14 +442,14 @@ var Clockwork = (function () {
     * @param {String} name - The name of the new object
     * @returns The object
     */
-    this.addObjectLive = function (name, kind,x,y,z,isStatic,timeTravels) {
+    this.addObjectLive = function (name, kind, x, y, z, isStatic, timeTravels) {
         var object = implementPreset(name, kind);
         if (object.sprite != undefined) {
-           object.spriteholder = animationEngine.addObject(object.sprite, undefined, x||0, y||0, z||0, isStatic||false, timeTravels||false);
+            object.spriteholder = animationEngine.addObject(object.sprite, undefined, x || 0, y || 0, z || 0, isStatic || false, timeTravels || false);
         }
-        object.setVar("#x",x||0);
-        object.setVar("#y",y||0);
-        object.setVar("#z",z||0);
+        object.setVar("#x", x || 0);
+        object.setVar("#y", y || 0);
+        object.setVar("#z", z || 0);
         object.execute_event("#setup");
         objects.push(object);
         return object;
@@ -579,9 +591,9 @@ var Clockwork = (function () {
     //......................
 
     function loop() {
-        
-        if(animationEngine.tick!=undefined){
-            animationEngine.tick(1000/fps);
+
+        if (animationEngine.tick != undefined) {
+            animationEngine.tick(1000 / fps);
         }
 
         if (processCollisions() == "#exit") {
@@ -603,7 +615,7 @@ var Clockwork = (function () {
     this.execute_event = function (name, e_args) {
         for (var i in objects) {
             var body = objects[i];
-            if (body.execute_event("#", {"name":name,"args":e_args}) == "#exit") {
+            if (body.execute_event("#", { "name": name, "args": e_args }) == "#exit") {
                 return "#exit";
             }
             if (body.execute_event(name, e_args) == "#exit") {
@@ -644,49 +656,52 @@ var Clockwork = (function () {
     };
 
     function processCollisions() {
-        //For every pair of (different) objects
-        for (var i = 0; i < objects.length; i++) {
-            for (var j = 0; j < objects.length; j++) {
-                if (i != j) {
-                    var b1 = objects[i];
-                    var b2 = objects[j];
-                    //For every kind of shape for each object
-                    for (var type1 = 0; type1 < collisions.shapes.length; type1++) {
-                        for (var type2 = 0; type2 < collisions.shapes.length; type2++) {
-                            var shape1 = collisions.shapes[type1];
-                            var shape2 = collisions.shapes[type2];
-                            if (b1.collision[shape1] != undefined && b2.collision[shape2] != undefined) {
-                                //For every shape of that kind in this object
-                                for (var k = 0; k < b1.collision[shape1].length; k++) {
-                                    for (var l = 0; l < b2.collision[shape2].length; l++) {
-                                        var bodyShape1 = b1.collision[shape1][k];
-                                        var bodyShape2 = b2.collision[shape2][l];
-                                        bodyShape1.x += b1.getVar("#x");
-                                        bodyShape1.y += b1.getVar("#y");
-                                        bodyShape2.x += b2.getVar("#x");
-                                        bodyShape2.y += b2.getVar("#y");
-                                        var data={};
-                                        //Check if they collide
-                                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2,data) == true) {
-                                            //Send the info to the #collide event handlers
-                                            if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l ,data:data}) == "#exit") {
-                                                return "#exit";
-                                            }
-                                            if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k ,data:data}) == "#exit") {
-                                                return "#exit";
-                                            }
-                                        }
-                                        bodyShape1.x -= b1.getVar("#x");
-                                        bodyShape1.y -= b1.getVar("#y");
-                                        bodyShape2.x -= b2.getVar("#x");
-                                        bodyShape2.y -= b2.getVar("#y");
+        collisionAlgorithm(objects, function (i, j) {
+            var b1 = objects[i];
+            var b2 = objects[j];
+            //For every kind of shape for each object
+            for (var type1 = 0; type1 < collisions.shapes.length; type1++) {
+                for (var type2 = 0; type2 < collisions.shapes.length; type2++) {
+                    var shape1 = collisions.shapes[type1];
+                    var shape2 = collisions.shapes[type2];
+                    if (b1.collision[shape1] != undefined && b2.collision[shape2] != undefined) {
+                        //For every shape of that kind in this object
+                        for (var k = 0; k < b1.collision[shape1].length; k++) {
+                            for (var l = 0; l < b2.collision[shape2].length; l++) {
+                                var bodyShape1 = b1.collision[shape1][k];
+                                var bodyShape2 = b2.collision[shape2][l];
+                                bodyShape1.x += b1.getVar("#x");
+                                bodyShape1.y += b1.getVar("#y");
+                                bodyShape1.z += b1.getVar("#z");
+                                bodyShape2.x += b2.getVar("#x");
+                                bodyShape2.y += b2.getVar("#y");
+                                bodyShape2.z += b2.getVar("#z");
+                                var data = {};
+                                //Check if they collide
+                                if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2, data) == true) {
+                                    //Send the info to the #collide event handlers
+                                    if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l, data: data, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }) == "#exit") {
+                                        return "#exit";
+                                    }
+                                    if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: data, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }) == "#exit") {
+                                        return "#exit";
                                     }
                                 }
+                                bodyShape1.x -= b1.getVar("#x");
+                                bodyShape1.y -= b1.getVar("#y");
+                                bodyShape1.z -= b1.getVar("#z");
+                                bodyShape2.x -= b2.getVar("#x");
+                                bodyShape2.y -= b2.getVar("#y");
+                                bodyShape2.z -= b2.getVar("#z");
                             }
                         }
                     }
                 }
             }
+        });
+
+        this.setCollisionAlgorithm = function (algorithm) {
+            collisionAlgorithm = algorithm;
         }
     }
 
