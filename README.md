@@ -57,6 +57,8 @@ A lightweight modular JavaScript game engine
 
 ##Get started
 
+If you are developing a UWP app, you should start downloading this Visual Studio template: [https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b](https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b)
+
 The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:
 
  ```javascript
