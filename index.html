@@ -5,13 +5,13 @@
     <title>Clockwork.js by arcadiogarcia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
     <section class="page-header">
-      <img src="http://arcadiogarcia.github.io/Clockwork.js/clockwork.png" alt="Clockwork logo" width="60%">
+      <h1 class="project-name">Clockwork.js</h1>
       <h2 class="project-tagline">A lightweight modular JavaScript game engine</h2>
       <a href="https://github.com/arcadiogarcia/Clockwork.js" class="btn">View on GitHub</a>
       <a href="https://github.com/arcadiogarcia/Clockwork.js/zipball/master" class="btn">Download .zip</a>
@@ -19,7 +19,7 @@
     </section>
 
     <section class="main-content">
-
+      <p><img src="https://github.com/arcadiogarcia/Clockwork.js/blob/master/assets/clockwork.png?raw=true" alt="Clockwork logo"></p>
 
 <h2>
 <a id="demos" class="anchor" href="#demos" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demos</h2>
@@ -32,7 +32,7 @@
 
 <p><a href="http://arcadiogarcia.github.io/Clockwork.js/examples/example4/example4.html">Example 4 - Flappy dog: DOMination</a></p>
 
-<p><a href="http://clockworkjsdemo1.azurewebsites.net/">Example 5 - Paradogs: The MMO</a></p>
+<p><a href="http://clockworkjs.azurewebsites.net/">Example 5 - Paradogs: The MMO</a></p>
 
 <h2>
 <a id="faq" class="anchor" href="#faq" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
@@ -94,14 +94,14 @@ This engine does not provide any functionality related to</p>
 
 <p>The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:</p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> somePresets <span class="pl-k">=</span> [
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> somePresets <span class="pl-k">=</span> [
 {
     name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someName<span class="pl-pds">"</span></span>,
     inherits<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someOtherPreset<span class="pl-pds">"</span></span>,
     sprite<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someSprite<span class="pl-pds">"</span></span>,
     events<span class="pl-k">:</span> [
         {
-            name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someEvent<span class="pl-pds">"</span></span>, <span class="pl-en">code</span>: <span class="pl-k">function</span> (<span class="pl-smi">event</span>) {
+            name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>someEvent<span class="pl-pds">"</span></span>, <span class="pl-en">code</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">event</span>) {
                 <span class="pl-c">//TODO</span>
             }
         },
@@ -152,7 +152,7 @@ Event names beggining with # are reserved for the engine:</li>
 
 <p>Then, you should write the levels .xml, which specify when and where will be the objects instantiated:</p>
 
-<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">levels</span>&gt;
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">levels</span>&gt;
   &lt;<span class="pl-ent">level</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>someName<span class="pl-pds">"</span></span>&gt;
     &lt;<span class="pl-ent">object</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>someName<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>somePreset<span class="pl-pds">"</span></span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span> <span class="pl-e">z</span>=<span class="pl-s"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span> <span class="pl-e">vars</span>=<span class="pl-s"><span class="pl-pds">'</span>{"w":90}<span class="pl-pds">'</span></span>&gt;&lt;/<span class="pl-ent">object</span>&gt;
     ...
@@ -180,29 +180,29 @@ When you load a level, all the objects that it contains will be instantiated:</p
 <li>
 <p>First of all, include the engine and the file with your presets:</p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>Clockwork.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>Clockwork.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
 &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>myPresets.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
 </li>
 <li>
 <p>Instantiate the Clockwork engine:</p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> engineInstance <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Clockwork</span>();</pre></div>
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> engineInstance <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Clockwork</span>();</pre></div>
 </li>
 <li>
 <p>Specify which animation library will you use. For 2D games, we recomend you to use <a href="https://github.com/arcadiogarcia/Spritesheet.js">Spritesheet.js</a>, which specifically was developed to be used with Clockwork.js. The library will handle all the rendering and the loading of the spritesheets, Clockwork.js will only tell the library what to draw.</p>
 
-<div class="highlight highlight-javascript"><pre>engineInstance.setAnimationEngine(canvasAnimation);</pre></div>
+<div class="highlight highlight-source-js"><pre>engineInstance.setAnimationEngine(canvasAnimation);</pre></div>
 </li>
 <li>
 <p>Load as many presets you neeed.</p>
 
-<div class="highlight highlight-javascript"><pre>engineInstance.loadPresets(somePresets);
+<div class="highlight highlight-source-js"><pre>engineInstance.loadPresets(somePresets);
 engineInstance.loadPresets(otherPresets);</pre></div>
 </li>
 <li>
 <p>Load the levels and use the callback to start the engine.</p>
 
-<div class="highlight highlight-javascript"><pre>engineInstance.loadLevelsFromXML(<span class="pl-s"><span class="pl-pds">"</span>levels.xml<span class="pl-pds">"</span></span>, <span class="pl-k">function</span> () {
+<div class="highlight highlight-source-js"><pre>engineInstance.loadLevelsFromXML(<span class="pl-s"><span class="pl-pds">"</span>levels.xml<span class="pl-pds">"</span></span>, <span class="pl-k">function</span> () {
             engineInstance.<span class="pl-c1">start</span>(<span class="pl-c1">30</span>, <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">"</span>canvas<span class="pl-pds">"</span></span>));
 });  </pre></div>
 
@@ -263,4 +263,3 @@ Add support for more complex (e.g. concave) shapes.</p></li>
   
   </body>
 </html>
-
