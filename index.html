@@ -19,7 +19,8 @@
     </section>
 
     <section class="main-content">
-      <p><img src="https://github.com/arcadiogarcia/Clockwork.js/blob/master/assets/clockwork.png?raw=true" alt="Clockwork logo"></p>
+      <p><img src="https://github.com/arcadiogarcia/Clockwork.js/blob/master/assets/clockwork.png?raw=true" alt="Clockwork logo">
+A lightweight modular JavaScript game engine</p>
 
 <h2>
 <a id="demos" class="anchor" href="#demos" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demos</h2>
@@ -32,7 +33,7 @@
 
 <p><a href="http://arcadiogarcia.github.io/Clockwork.js/examples/example4/example4.html">Example 4 - Flappy dog: DOMination</a></p>
 
-<p><a href="http://clockworkjs.azurewebsites.net/">Example 5 - Paradogs: The MMO</a></p>
+<p><a href="http://clockworkjsdemo1.azurewebsites.net/">Example 5 - Paradogs: The MMO</a></p>
 
 <h2>
 <a id="faq" class="anchor" href="#faq" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
@@ -60,7 +61,7 @@
 <p><strong>What does this engine do?</strong></p>
 
 <p>This engine is focused mainly in allowing to implement the game logic using events and event handlers, define presets (think of them as classes) that can be easily instantiated in levels, and use a modular engine so common elements (as input handlers, menu elements or even enemies) can be shared across games.
-This engine does not provide any functionality related to</p>
+This engine does not provide any functionality related to AI or physics.</p>
 </li>
 <li>
 <p><strong>How do I use this engine?</strong></p>
@@ -70,7 +71,7 @@ This engine does not provide any functionality related to</p>
 <li>
 <p><strong>Can I use this engine for 3D games?</strong></p>
 
-<p>Yes you can! All the examples provided are 2D because they use <a href="https://github.com/arcadiogarcia/Spritesheet.js">Spritesheet.js</a>, a 2D rendering library, but you should be able to use any 3D (or 2D) library (or write your own) if write a wrapper (stay tuned for more info about this).</p>
+<p>Yes you can! All the examples provided are 2D because they use <a href="https://github.com/arcadiogarcia/Spritesheet.js">Spritesheet.js</a>, a 2D rendering library, but you should be able to use any 3D (or 2D) library (or write your own) if write a wrapper (read the examples at <a href="https://github.com/arcadiogarcia/Clockwork.js/tree/master/src/animation">src/animation</a>).</p>
 </li>
 <li>
 <p><strong>I have written a nice preset that I want to share, may I add it to the collection included in the src/presets folder</strong></p>
@@ -80,7 +81,7 @@ This engine does not provide any functionality related to</p>
 <li>
 <p><strong>Can I use [Some library] for the animation?</strong></p>
 
-<p>Yes, you will only have to write a wrapper, more info about that soon.</p>
+<p>Yes, you will only have to write a wrapper, you can find some examples at <a href="https://github.com/arcadiogarcia/Clockwork.js/tree/master/src/animation">src/animation</a></p>
 </li>
 <li>
 <p><strong>Can I make a multiplayer game?</strong></p>
@@ -91,6 +92,8 @@ This engine does not provide any functionality related to</p>
 
 <h2>
 <a id="get-started" class="anchor" href="#get-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get started</h2>
+
+<p>If you are developing a UWP app, you should start downloading this Visual Studio template: <a href="https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b">https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b</a></p>
 
 <p>The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:</p>
 
@@ -233,16 +236,23 @@ engineInstance.loadPresets(otherPresets);</pre></div>
 <h2>
 <a id="roadmap" class="anchor" href="#roadmap" aria-hidden="true"><span class="octicon octicon-link"></span></a>Roadmap</h2>
 
-<p>These items are on the roadmap:</p>
+<p>These items are being developed right now:</p>
 
 <ul>
-<li><p><strong>Animation library sample wrapper</strong>
-<del>Provide an example of the methods that the animation library used must implement.</del> <a href="https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example4/DOManimation.js">examples/example4/DOManimation.js</a> shows how to write a simple animation library, and you can find more exaples in src/animation.</p></li>
-<li><p><strong>Editor</strong>:
-Develop a drag and drop editor to create levels more easily.</p></li>
 <li><p><strong>More presets</strong>
 Write presets to handle other input methods: keyboard, pointers, accelerometer...
 Also, write platform specific presets (e.g. notifications, live tiles for Windows).</p></li>
+<li><p><strong>3D animation wrapper</strong>
+A wrapper to use spritesheet.js and 2D sprites for 3D games using cavalier perspective</p></li>
+<li><p><strong>Multiple inheritance/composition</strong>
+Allows that object or presets inherit from multiple presets.</p></li>
+</ul>
+
+<p>These items are on the roadmap:</p>
+
+<ul>
+<li><p><strong>Editor</strong>:
+Develop a drag and drop editor to create levels more easily.</p></li>
 <li><p><strong>More collision detectors</strong>
 Add support for more complex (e.g. concave) shapes.</p></li>
 </ul>
