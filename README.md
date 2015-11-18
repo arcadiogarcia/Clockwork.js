@@ -41,7 +41,7 @@ A lightweight modular JavaScript game engine
 
   - **Can I use this engine for 3D games?**
 
-  Yes you can! All the examples provided are 2D because they use [Spritesheet.js](https://github.com/arcadiogarcia/Spritesheet.js), a 2D rendering library, but you should be able to use any 3D (or 2D) library (or write your own) if write a wrapper (read the examples at [src/animation](https://github.com/arcadiogarcia/Clockwork.js/tree/master/src/animation)).
+  Yes you can! All the examples provided are 2D because they use [Spritesheet.js](https://github.com/arcadiogarcia/Spritesheet.js), a 2D rendering library, but you should be able to use any 3D (or 2D) library (or write your own) if write a wrapper  (read the examples at [src/animation](https://github.com/arcadiogarcia/Clockwork.js/tree/master/src/animation)). Actually, in the last release there have been added a 3d collision detector and some animation proxies that allow you to render a 3D game in 2D. You can still write a wrapper for your favourite 2d/3d library.
 
   - **I have written a nice preset that I want to share, may I add it to the collection included in the src/presets folder**
 
@@ -57,9 +57,9 @@ A lightweight modular JavaScript game engine
 
 ##Get started
 
-If you are developing a UWP app, you should start downloading this Visual Studio template: [https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b](https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b)
+If you are developing a UWP app, you should start downloading this Visual Studio template: [https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b](https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b). If not, you can use one of the examples of this repository as a template.
 
-The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:
+The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. They can inherit from other presets, or you can even use composition, telling a preset to inherit from multiple presets at the same time. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:
 
  ```javascript
 var somePresets = [
@@ -93,7 +93,7 @@ var somePresets = [
 As you can see, you can specify many properties of the preset, but only the name is mandatory:
 
   - *name* : Specifies the preset name, it must be unique.
-  - *inherits* : You can specify a preset from which the actual one will inherit the event handlers, sprite, collision shapes and variables (but they can be overwritten if you want to change them).
+  - *inherits* : You can specify a preset from which the actual one will inherit the event handlers, sprite, collision shapes and variables (but they can be overwritten if you want to change them). Since v1.1, you can use multiple inheritance/composition, just specify an array of presets instead of a single one: the properties will be fused but all the event handlers will keep working even if they have the same name.
   - *sprite* : Specifies the spritesheet used to draw the object in the screen.
   - *events* : The event handlers will contain all the logic of your game. They are functions that will be executed when some event happens, they may accept parameters inside the event object and may also return something.
   Event names beggining with # are reserved for the engine:
