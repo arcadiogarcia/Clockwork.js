@@ -33,7 +33,7 @@ A lightweight modular JavaScript game engine
   - **What does this engine do?**
 
   This engine is focused mainly in allowing to implement the game logic using events and event handlers, define presets (think of them as classes) that can be easily instantiated in levels, and use a modular engine so common elements (as input handlers, menu elements or even enemies) can be shared across games.
-  This engine does not provide any functionality related to
+  This engine does not provide any functionality related to AI or physics.
   
   - **How do I use this engine?**
 
@@ -41,7 +41,7 @@ A lightweight modular JavaScript game engine
 
   - **Can I use this engine for 3D games?**
 
-  Yes you can! All the examples provided are 2D because they use [Spritesheet.js](https://github.com/arcadiogarcia/Spritesheet.js), a 2D rendering library, but you should be able to use any 3D (or 2D) library (or write your own) if write a wrapper (stay tuned for more info about this).
+  Yes you can! All the examples provided are 2D because they use [Spritesheet.js](https://github.com/arcadiogarcia/Spritesheet.js), a 2D rendering library, but you should be able to use any 3D (or 2D) library (or write your own) if write a wrapper (read the examples at [src/animation](https://github.com/arcadiogarcia/Clockwork.js/tree/master/src/animation)).
 
   - **I have written a nice preset that I want to share, may I add it to the collection included in the src/presets folder**
 
@@ -49,13 +49,15 @@ A lightweight modular JavaScript game engine
 
   - **Can I use [Some library] for the animation?**
 
-  Yes, you will only have to write a wrapper, more info about that soon.
+  Yes, you will only have to write a wrapper, you can find some examples at [src/animation](https://github.com/arcadiogarcia/Clockwork.js/tree/master/src/animation)
   
   - **Can I make a multiplayer game?**
 
   Since the Clockwork.js is event based, it is very easy to communicate many engine instances. There is a general-purpose  implementation already written in examples/example5, that can be adapted to fit your specific needs.
 
 ##Get started
+
+If you are developing a UWP app, you should start downloading this Visual Studio template: [https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b](https://visualstudiogallery.msdn.microsoft.com/bf3e790d-68c6-4e76-8d9f-20626b88651b)
 
 The first step to build you game is to write the presets. You can think of them as 'classes' in classical object oriented languages such as C# and Java: they specify the properties and behaviour of a certain type of objects that will be instantiated on the level. Presets must be defined in a .js file following a structure that closely resembles JSON data, but including functions:
 
@@ -179,23 +181,27 @@ If you are interested in the animation and rendering, you should learn more abou
 
 ##Roadmap
 
-These items are on the roadmap:
-
-  - **Animation library sample wrapper**
-  ~~Provide an example of the methods that the animation library used must implement.~~ [examples/example4/DOManimation.js](https://github.com/arcadiogarcia/Clockwork.js/blob/master/examples/example4/DOManimation.js) shows how to write a simple animation library, and you can find more exaples in src/animation.
-
-
-  - **Editor**:
-  Develop a drag and drop editor to create levels more easily.
-
+These items are being developed right now:
 
   - **More presets**
   Write presets to handle other input methods: keyboard, pointers, accelerometer...
   Also, write platform specific presets (e.g. notifications, live tiles for Windows).
 
+  - **3D animation wrapper**
+  A wrapper to use spritesheet.js and 2D sprites for 3D games using cavalier perspective
+
+  - **Multiple inheritance/composition**
+  Allows that object or presets inherit from multiple presets.
+
+These items are on the roadmap:
+
+  - **Editor**:
+  Develop a drag and drop editor to create levels more easily.
 
   - **More collision detectors**
   Add support for more complex (e.g. concave) shapes.
+
+  
 
 ##Contact
 
