@@ -827,6 +827,36 @@ var Clockwork = (function () {
     this.setCollisionAlgorithm = function (algorithm) {
         return collisionAlgorithm = algorithm;
     };
+    
+    /**
+    *Checks if a given collider collides with any objects in the level
+    *@param {String} type - The collider type
+    *@param {Object} collider - The collider
+    */
+
+    this.collisionQuery = function (type, collider) {
+        var result=[];
+        var shape2 = type;
+        for (var i = 0; i < objects.length; i++) {
+            b1 = objects[i];
+            if (b1 != undefined) {
+                //For each kind of shape
+                for (var shape1 in b1.collision) {
+                    shapesBody1 = b1.collision[shape1];
+                    //For each shape of that kind
+                    for (var k = 0; k < shapesBody1.length; k++) {
+                        bodyShape1 = shapesBody1[k];
+                        collisionData = {};
+                        //Check if they collide
+                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, collider, collisionData) == true) {
+                            result.push(i);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    };
 
     //Outside for optimization purposes
     var cache;
