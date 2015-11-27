@@ -401,6 +401,10 @@ var Clockwork = (function () {
                     }
                 }
                 return false;
+            },
+            //Mark as dirty
+            collisionChanged: function (name) {
+                this.vars["#moveflag"] = true;
             }
         };
     }
@@ -835,7 +839,7 @@ var Clockwork = (function () {
     */
 
     this.collisionQuery = function (type, collider) {
-        var result=[];
+        var result = [];
         var shape2 = type;
         for (var i = 0; i < objects.length; i++) {
             b1 = objects[i];
