@@ -24,6 +24,8 @@ var basicClickPreset = [
                     this.collision["point"][1].x += e.target.offsetLeft;
                     this.collision["point"][1].y += e.target.offsetTop;
                 }
+                
+                this.collisionChanged();
                 this.setVar("timer", 1);
                 //Warning: This will only work if there is no scaling between the game coordinates and the canvas!
                 //If you are using a custom Spritesheet.js renderMode, you will need to do something like this:
@@ -37,7 +39,9 @@ var basicClickPreset = [
          {
              name: "onmove", code: function (e) {
                  this.collision["point"][0].x = e.offsetX==undefined?e.layerX:e.offsetX;
-                 this.collision["point"][0].y = e.offsetY==undefined?e.layerY:e.offsetY;
+                 this.collision["point"][0].y = e.offsetY==undefined?e.layerY:e.offsetY;  
+                 
+                 this.collisionChanged();
                  //Warning: Read the previous warning
              }
          },
@@ -45,10 +49,9 @@ var basicClickPreset = [
              name: "#loop", code: function (event) {
                  //We wait one iteration before deleting the click coordinates
                  if (this.getVar("timer") == 1) {
-                     this.setVar("timer", 2);
-                 } else if (this.getVar("timer") == 2) {
                      this.collision["point"][1].x = NaN;
                      this.collision["point"][1].y = NaN;
+                     this.collisionChanged();
                      this.setVar("timer", 0);
                  }
              }
