@@ -47,11 +47,18 @@ var Clockwork = (function () {
                     if (i != j && objects[j] != undefined) {
                         if (!(moved[i] == false && (moved[j] || objects[j].vars["#moveflag"]) == false)) {
                             collisionCache[i][j] = calculate(i, j);
+                            if(collisionCache[i][j]=="#exit"){
+                                return "#exit";
+                            }
                         } else {
                             var cache = collisionCache[i][j];
                             for (var k = 0; k < cache.length; k++) {
-                                objects[i].execute_event("#collide", cache[k].a);
-                                objects[j].execute_event("#collide", cache[k].b);
+                                if(objects[i].execute_event("#collide", cache[k].a)=="#exit"){
+                                    return "#exit";
+                                }
+                                if(objects[j].execute_event("#collide", cache[k].b)=="#exit"){
+                                   return "#exit";
+                                }
                             }
                         }
                     }
@@ -400,6 +407,9 @@ var Clockwork = (function () {
                         }
                     }
                 }
+                if (this.prototype != undefined && this.prototype.instanceOf != undefined) {
+                    return this.prototype.instanceOf(name);
+                }
                 return false;
             },
             //Mark as dirty
@@ -411,6 +421,7 @@ var Clockwork = (function () {
 
     function inheritPreset(name, parent) {
         presets[name] = inheritObject(presets[parent]);
+        presets[name].name = name;
         presets[name].prototypes = [presets[parent]];
         presets[name].vars = inheritObject(presets[parent].vars);
         presets[name].eventfunction = inheritObject(presets[parent].eventfunction);
@@ -825,7 +836,7 @@ var Clockwork = (function () {
     };
 
     function processCollisions() {
-        collisionAlgorithm(objects, checkCollision);
+        return collisionAlgorithm(objects, checkCollision);
     }
 
     this.setCollisionAlgorithm = function (algorithm) {
