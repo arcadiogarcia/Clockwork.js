@@ -47,17 +47,17 @@ var Clockwork = (function () {
                     if (i != j && objects[j] != undefined) {
                         if (!(moved[i] == false && (moved[j] || objects[j].vars["#moveflag"]) == false)) {
                             collisionCache[i][j] = calculate(i, j);
-                            if(collisionCache[i][j]=="#exit"){
+                            if (collisionCache[i][j] == "#exit") {
                                 return "#exit";
                             }
                         } else {
                             var cache = collisionCache[i][j];
                             for (var k = 0; k < cache.length; k++) {
-                                if(objects[i].execute_event("#collide", cache[k].a)=="#exit"){
+                                if (objects[i].execute_event("#collide", cache[k].a) == "#exit") {
                                     return "#exit";
                                 }
-                                if(objects[j].execute_event("#collide", cache[k].b)=="#exit"){
-                                   return "#exit";
+                                if (objects[j].execute_event("#collide", cache[k].b) == "#exit") {
+                                    return "#exit";
                                 }
                             }
                         }
@@ -578,13 +578,13 @@ var Clockwork = (function () {
         object.setVar("#x", x || 0);
         object.setVar("#y", y || 0);
         object.setVar("#z", z || 0);
+        if (object.sprite != undefined) {
+            object.spriteholder = animationEngine.addObject(object.sprite, object.getVar("#state"), x || 0, y || 0, z || 0, isStatic || false, timeTravels || false);
+        }
         for (var name in vars) {
             object.setVar(name, vars[name]);
         }
         object.execute_event("#setup");
-        if (object.sprite != undefined) {
-            object.spriteholder = animationEngine.addObject(object.sprite, object.getVar("#state"), x || 0, y || 0, z || 0, isStatic || false, timeTravels || false);
-        }
         objects.push(object);
         return object;
     }
