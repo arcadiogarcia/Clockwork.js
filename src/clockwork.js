@@ -47,11 +47,18 @@ var Clockwork = (function () {
                     if (i != j && objects[j] != undefined) {
                         if (!(moved[i] == false && (moved[j] || objects[j].vars["#moveflag"]) == false)) {
                             collisionCache[i][j] = calculate(i, j);
+                            if (collisionCache[i][j] == "#exit") {
+                                return "#exit";
+                            }
                         } else {
                             var cache = collisionCache[i][j];
                             for (var k = 0; k < cache.length; k++) {
-                                objects[i].execute_event("#collide", cache[k].a);
-                                objects[j].execute_event("#collide", cache[k].b);
+                                if (objects[i].execute_event("#collide", cache[k].a) == "#exit") {
+                                    return "#exit";
+                                }
+                                if (objects[j].execute_event("#collide", cache[k].b) == "#exit") {
+                                    return "#exit";
+                                }
                             }
                         }
                     }
@@ -400,13 +407,21 @@ var Clockwork = (function () {
                         }
                     }
                 }
+                if (this.prototype != undefined && this.prototype.instanceOf != undefined) {
+                    return this.prototype.instanceOf(name);
+                }
                 return false;
+            },
+            //Mark as dirty
+            collisionChanged: function (name) {
+                this.vars["#moveflag"] = true;
             }
         };
     }
 
     function inheritPreset(name, parent) {
         presets[name] = inheritObject(presets[parent]);
+        presets[name].name = name;
         presets[name].prototypes = [presets[parent]];
         presets[name].vars = inheritObject(presets[parent].vars);
         presets[name].eventfunction = inheritObject(presets[parent].eventfunction);
@@ -563,13 +578,13 @@ var Clockwork = (function () {
         object.setVar("#x", x || 0);
         object.setVar("#y", y || 0);
         object.setVar("#z", z || 0);
+        if (object.sprite != undefined) {
+            object.spriteholder = animationEngine.addObject(object.sprite, object.getVar("#state"), x || 0, y || 0, z || 0, isStatic || false, timeTravels || false);
+        }
         for (var name in vars) {
             object.setVar(name, vars[name]);
         }
         object.execute_event("#setup");
-        if (object.sprite != undefined) {
-            object.spriteholder = animationEngine.addObject(object.sprite, object.getVar("#state"), x || 0, y || 0, z || 0, isStatic || false, timeTravels || false);
-        }
         objects.push(object);
         return object;
     }
@@ -821,11 +836,41 @@ var Clockwork = (function () {
     };
 
     function processCollisions() {
-        collisionAlgorithm(objects, checkCollision);
+        return collisionAlgorithm(objects, checkCollision);
     }
 
     this.setCollisionAlgorithm = function (algorithm) {
         return collisionAlgorithm = algorithm;
+    };
+    
+    /**
+    *Checks if a given collider collides with any objects in the level
+    *@param {String} type - The collider type
+    *@param {Object} collider - The collider
+    */
+
+    this.collisionQuery = function (type, collider) {
+        var result = [];
+        var shape2 = type;
+        for (var i = 0; i < objects.length; i++) {
+            b1 = objects[i];
+            if (b1 != undefined) {
+                //For each kind of shape
+                for (var shape1 in b1.collision) {
+                    shapesBody1 = b1.collision[shape1];
+                    //For each shape of that kind
+                    for (var k = 0; k < shapesBody1.length; k++) {
+                        bodyShape1 = shapesBody1[k];
+                        collisionData = {};
+                        //Check if they collide
+                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, collider, collisionData) == true) {
+                            result.push(i);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     };
 
     //Outside for optimization purposes
