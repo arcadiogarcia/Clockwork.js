@@ -215,6 +215,9 @@ var Clockwork = (function () {
         for (var i = 0; i < array.length; i++) {
             var object = array[i];
             for (var j = 0; j < keys.length; j++) {
+                if (typeof object == "undefined") {
+                    continue;
+                }
                 object = object[keys[j]];
             }
             if (object == value) {
@@ -402,9 +405,15 @@ var Clockwork = (function () {
                 }
                 if (this.prototypes != undefined) {
                     for (var i = 0; i < this.prototypes.length; i++) {
-                        if (this.prototypes.instanceOf != undefined) {
-                            return this.prototype.instanceOf(name);
+                        if (this.prototypes[i].name == name) {
+                            return true;
                         }
+                        if (this.prototypes[i].instanceOf != undefined) {
+                            if (this.prototypes[i].instanceOf(name) == true) {
+                                return true;
+                            }
+                        }
+
                     }
                 }
                 if (this.prototype != undefined && this.prototype.instanceOf != undefined) {
