@@ -35,23 +35,34 @@ var Clockwork = (function () {
 
     var collisionCache = [];
 
+    function isEmpty(x) {
+        for (var k in x) {
+            return false;
+        }
+        return true;
+    }
+
     //The algorithm used to when detecting the collisions
     var collisionAlgorithm = function (objects, calculate) {
         var moved = [];
         for (var i = 0; i < objects.length; i++) {
-            if (objects[i] != undefined) {
+            if (objects[i] != undefined && !isEmpty(objects[i].collision)) {
                 moved[i] = objects[i].vars["#moveflag"];
                 objects[i].vars["#moveflag"] = false;
-                collisionCache[i] = collisionCache[i] || [];
+                if (collisionCache[i] === undefined) {
+                    collisionCache[i] = [];
+                }
+                var thisCache = collisionCache[i];
                 for (var j = 0; j < objects.length; j++) {
-                    if (i != j && objects[j] != undefined) {
+                    var secondObject = objects[j];
+                    if (i != j && objects[j] != undefined && !isEmpty(objects[j].collision)) {
                         if (!(moved[i] == false && (moved[j] || objects[j].vars["#moveflag"]) == false)) {
-                            collisionCache[i][j] = calculate(i, j);
-                            if (collisionCache[i][j] == "#exit") {
+                            thisCache[j] = calculate(i, j);
+                            if (thisCache[j] == "#exit") {
                                 return "#exit";
                             }
                         } else {
-                            var cache = collisionCache[i][j];
+                            var cache = thisCache[j];
                             for (var k = 0; k < cache.length; k++) {
                                 if (objects[i].execute_event("#collide", cache[k].a) == "#exit") {
                                     return "#exit";
@@ -215,6 +226,9 @@ var Clockwork = (function () {
         for (var i = 0; i < array.length; i++) {
             var object = array[i];
             for (var j = 0; j < keys.length; j++) {
+                if (typeof object == "undefined") {
+                    continue;
+                }
                 object = object[keys[j]];
             }
             if (object == value) {
@@ -334,7 +348,7 @@ var Clockwork = (function () {
             vars: {},
             name: name,
             engine: clockwork,
-            collision: [],
+            collision: {},
             setVar: function (variable, value) {
                 switch (variable) {
                     case "#x":
@@ -402,9 +416,15 @@ var Clockwork = (function () {
                 }
                 if (this.prototypes != undefined) {
                     for (var i = 0; i < this.prototypes.length; i++) {
-                        if (this.prototypes.instanceOf != undefined) {
-                            return this.prototype.instanceOf(name);
+                        if (this.prototypes[i].name == name) {
+                            return true;
                         }
+                        if (this.prototypes[i].instanceOf != undefined) {
+                            if (this.prototypes[i].instanceOf(name) == true) {
+                                return true;
+                            }
+                        }
+
                     }
                 }
                 if (this.prototype != undefined && this.prototype.instanceOf != undefined) {
@@ -842,13 +862,13 @@ var Clockwork = (function () {
     this.setCollisionAlgorithm = function (algorithm) {
         return collisionAlgorithm = algorithm;
     };
-    
+
     /**
     *Checks if a given collider collides with any objects in the level
     *@param {String} type - The collider type
     *@param {Object} collider - The collider
     */
-
+    var collisionData = {};
     this.collisionQuery = function (type, collider) {
         var result = [];
         var shape2 = type;
@@ -861,7 +881,6 @@ var Clockwork = (function () {
                     //For each shape of that kind
                     for (var k = 0; k < shapesBody1.length; k++) {
                         bodyShape1 = shapesBody1[k];
-                        collisionData = {};
                         //Check if they collide
                         if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, collider, collisionData) == true) {
                             result.push(i);
@@ -874,6 +893,7 @@ var Clockwork = (function () {
     };
 
     //Outside for optimization purposes
+    var emptyCache = [];
     var cache;
     var b1;
     var b2;
@@ -887,22 +907,22 @@ var Clockwork = (function () {
     var shapesBody2;
     var bodyShape1;
     var bodyShape2;
-    var collisionData;
+    var collisionData = {};
+    var shape1, shape2,k,l;
     function checkCollision(i, j) {
-        cache = [];
+        cache = emptyCache;
         b1 = objects[i];
         b2 = objects[j];
         //For each kind of shape
-        for (var shape1 in b1.collision) {
-            for (var shape2 in b2.collision) {
+        for (shape1 in b1.collision) {
+            for (shape2 in b2.collision) {
                 shapesBody1 = b1.collision[shape1];
                 shapesBody2 = b2.collision[shape2];
                 //For each shape of that kind
-                for (var k = 0; k < shapesBody1.length; k++) {
-                    for (var l = 0; l < shapesBody2.length; l++) {
+                for (k = 0; k < shapesBody1.length; k++) {
+                    for (l = 0; l < shapesBody2.length; l++) {
                         bodyShape1 = shapesBody1[k];
                         bodyShape2 = shapesBody2[l];
-                        collisionData = {};
                         //Check if they collide
                         if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2, collisionData) == true) {
                             //Send the info to the #collide event handlers
@@ -912,7 +932,10 @@ var Clockwork = (function () {
                             if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: collisionData, shape1tag: bodyShape2["#tag"], shape2tag: bodyShape1["#tag"] }) == "#exit") {
                                 return "#exit";
                             }
-                            cache.push({ a: { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }, b: { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] } });
+                            if (cache.length == 0) {
+                                cache = [];
+                                cache.push({ a: { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }, b: { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] } });
+                            }
                         }
                     }
                 }
@@ -922,3 +945,4 @@ var Clockwork = (function () {
     }
 
 });
+
