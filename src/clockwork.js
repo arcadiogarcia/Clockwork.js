@@ -403,6 +403,19 @@ var Clockwork = (function () {
             getVar: function (variable) {
                 return this.vars[variable];
             },
+            setCollider: function (tag, value) {
+                for (var shape in this.collision) {
+                    var shapesBody = b1.collision[shape1];
+                    for (k = 0; k < shapesBody1.length; k++) {
+                        if(shapesBody[k]["#tag"]==tag){
+                            shapesBody[k]=value;
+                            shapesBody[k].x+=this.vars["#x"];
+                            shapesBody[k].y+=this.vars["#y"];
+                            shapesBody[k]["#tag"]=tag;
+                        }
+                    }
+                }
+            },
             execute_event: function (name, args) {
                 if (this.eventfunction[name] != undefined) {
                     return this.eventfunction[name].call(this, args);
@@ -908,7 +921,7 @@ var Clockwork = (function () {
     var bodyShape1;
     var bodyShape2;
     var collisionData = {};
-    var shape1, shape2,k,l;
+    var shape1, shape2, k, l;
     function checkCollision(i, j) {
         cache = emptyCache;
         b1 = objects[i];
