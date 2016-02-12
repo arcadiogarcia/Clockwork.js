@@ -1,0 +1,79 @@
+<spritesheets>
+ <spritesheet name="light" >
+
+    <states>
+      <state name="normal">
+        <layer name="walls"></layer>
+        <layer name="lightpath"></layer>
+        <layer name="light"></layer>
+      </state>
+    </states>
+
+    <layers>
+      <layer name="light" x="0" y="0">
+        <frame name="light"></frame>
+      </layer>
+      <layer name="walls" x="0" y="0">
+        <frame name="walls"></frame>
+      </layer>
+      <layer name="lightpath" x="0" y="0">
+        <frame name="lightpath"></frame>
+      </layer>
+    </layers>
+
+    <frames>
+      <frame name="light" code=" context.beginPath();
+      context.arc(vars['$x'], vars['$y'], 10, 0, 2 * Math.PI, false);
+      context.fillStyle = '#EEEE00';
+      context.fill();
+      context.lineWidth = 5;
+      context.strokeStyle = '#CCCC00';
+      context.stroke();" t="0"></frame>
+    
+    <frame name="walls" code="
+    vars['$walls'].forEach(function(x){
+      context.beginPath();
+      context.lineWidth = 5;
+      context.strokeStyle = '#000';
+      context.moveTo(x.x0, x.y0);
+      context.lineTo(x.x1, x.y1);
+      context.stroke();
+      });" t="0"></frame>
+    
+    <frame name="lightpath" code="
+        if(vars['$lightpath'].length>0){
+        var radgrad = context.createRadialGradient(vars['$x'],vars['$y'],10,vars['$x'],vars['$y'],200+100*Math.cos(t/300));
+        radgrad.addColorStop(0, '#EE0');
+        radgrad.addColorStop(0.9, 'rgba(255,255,200,0.5)');
+        radgrad.addColorStop(1, 'rgba(255,255,255,0)');
+        
+        
+    context.beginPath();
+    context.fillStyle = radgrad;
+    context.globalAlpha=0.3;
+    context.moveTo(vars['$lightpath'][0].x|0, vars['$lightpath'][0].y|0);
+    vars['$lightpath'].forEach(function(x){
+      context.lineTo(x.x|0, x.y|0);
+      });
+            context.fill();
+            
+            
+    context.beginPath();
+    context.moveTo(0,0);
+    context.lineTo(0,400);
+    context.lineTo(800,400);
+    context.lineTo(800,0);
+    context.closePath();
+    context.moveTo(vars['$lightpath'][0].x|0, vars['$lightpath'][0].y|0);
+    vars['$lightpath'].forEach(function(x){
+      context.lineTo(x.x|0, x.y|0);
+      });
+      context.closePath();
+          context.fillStyle = '#000';
+    context.globalAlpha=0.6;
+      context.fill();
+            }" t="0"></frame>
+    </frames>
+
+  </spritesheet>
+</spritesheets>
