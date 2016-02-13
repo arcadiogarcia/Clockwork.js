@@ -811,18 +811,21 @@ var Clockwork = (function () {
     */
 
     this.execute_event = function (name, e_args) {
+        var r, result = [];
         for (var i = 0; i < objects.length; i++) {
             var body = objects[i];
             if (body != undefined) {
                 if (body.execute_event("#", { "name": name, "args": e_args }) == "#exit") {
                     return "#exit";
                 }
-                if (body.execute_event(name, e_args) == "#exit") {
+                r = body.execute_event(name, e_args);
+                if (r == "#exit") {
                     return "#exit";
                 }
+                result.push(r);
             }
         }
-
+        return result;
     };
 
     //..........................
@@ -908,7 +911,7 @@ var Clockwork = (function () {
     var bodyShape1;
     var bodyShape2;
     var collisionData = {};
-    var shape1, shape2,k,l;
+    var shape1, shape2, k, l;
     function checkCollision(i, j) {
         cache = emptyCache;
         b1 = objects[i];
