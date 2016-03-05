@@ -11,7 +11,7 @@
 //              -event.image            String containing the url of the live tile image
 //              -event.wideimage        String containing the url of the wide live tile image
 //              -event.bigimage        String containing the url of the wide live tile image
-//              -event.date (optional)  Date object containing the exìration time of the tile
+//              -event.date (optional)  Date object containing the expiration time of the tile
 //  ------------------
 
 var W10API = W10API || [];
@@ -80,11 +80,6 @@ W10API.push({
 
             }
         }
-    ],
-    vars: [
-        { "name": "duration", "value": "long" },
-        { "name": "sound", "value": "ms-winsoundevent:Notification.IM" },
-        { "name": "appbarnotificationduration", "value": 200 },
     ]
 });
 
