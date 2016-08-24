@@ -55,7 +55,7 @@ var Clockwork = (function () {
                 var thisCache = collisionCache[i];
                 for (var j = 0; j < objects.length; j++) {
                     var secondObject = objects[j];
-                    if (i != j && objects[j] != undefined && !isEmpty(objects[j].collision)) {
+                    if (i != j && objects[j] != undefined && !isEmpty(objects[j].collision) && objects[i] != undefined) {
                         if (!(moved[i] == false && (moved[j] || objects[j].vars["#moveflag"]) == false)) {
                             thisCache[j] = calculate(i, j);
                             if (thisCache[j] == "#exit") {
@@ -405,13 +405,13 @@ var Clockwork = (function () {
             },
             setCollider: function (tag, value) {
                 for (var shape in this.collision) {
-                    var shapesBody = b1.collision[shape1];
-                    for (k = 0; k < shapesBody1.length; k++) {
-                        if(shapesBody[k]["#tag"]==tag){
-                            shapesBody[k]=value;
-                            shapesBody[k].x+=this.vars["#x"];
-                            shapesBody[k].y+=this.vars["#y"];
-                            shapesBody[k]["#tag"]=tag;
+                    var shapesBody = this.collision[shape];
+                    for (k = 0; k < shapesBody.length; k++) {
+                        if (shapesBody[k]["#tag"] == tag) {
+                            shapesBody[k] = value;
+                            shapesBody[k].x += this.vars["#x"];
+                            shapesBody[k].y += this.vars["#y"];
+                            shapesBody[k]["#tag"] = tag;
                         }
                     }
                 }
@@ -650,12 +650,14 @@ var Clockwork = (function () {
         if (clockwork.loader) {
             clockwork.loader.show();
         }
-        deleteSprites();
-        //Just in case?
-        animationEngine.clear();
-        objects = loadLevelObjects(levels[n]).objects;
-        assignSprites();
-        clockwork.setup();
+        setTimeout(function () {
+            deleteSprites();
+            //Just in case?
+            animationEngine.clear();
+            objects = loadLevelObjects(levels[n]).objects;
+            assignSprites();
+            clockwork.setup();
+        }, 5);
     };
 
     /**
@@ -824,18 +826,21 @@ var Clockwork = (function () {
     */
 
     this.execute_event = function (name, e_args) {
+        var r, result = [];
         for (var i = 0; i < objects.length; i++) {
             var body = objects[i];
             if (body != undefined) {
                 if (body.execute_event("#", { "name": name, "args": e_args }) == "#exit") {
                     return "#exit";
                 }
-                if (body.execute_event(name, e_args) == "#exit") {
+                r = body.execute_event(name, e_args);
+                if (r == "#exit") {
                     return "#exit";
                 }
+                result.push(r);
             }
         }
-
+        return result.filter(function (x) { return x !== undefined });
     };
 
     //..........................
@@ -951,6 +956,12 @@ var Clockwork = (function () {
                             }
                         }
                     }
+                }
+                if (!b2) {
+                    break;
+                }
+                if (!b1) {
+                    return;
                 }
             }
         }
