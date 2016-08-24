@@ -448,6 +448,13 @@ var Clockwork = (function () {
             //Mark as dirty
             collisionChanged: function (name) {
                 this.vars["#moveflag"] = true;
+            },
+            getVarKeys:function(){
+                var keys=[];
+                for(var k in this.vars){
+                    keys.push(k);
+                }
+                return keys;
             }
         };
     }
@@ -624,6 +631,7 @@ var Clockwork = (function () {
 
 
 
+
     this.deleteObjectLive = function (object) {
         object.execute_event("#exit", []);
         animationEngine.deleteObject(object.spriteholder);
@@ -632,6 +640,10 @@ var Clockwork = (function () {
                 objects[i] = undefined;
             }
         }
+    }
+
+    this.listObjects = function () {
+        return objects.map(function(x){return x.getVar("#name")});
     }
 
     /**
