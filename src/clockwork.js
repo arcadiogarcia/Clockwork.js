@@ -155,7 +155,7 @@ var Clockwork = (function () {
 *@param {Object} variable - The object name
 */
     this.find = function (variable) {
-        return searchWhereDeep(objects, ["vars", "name"], variable);
+        return searchWhereDeep(objects, ["vars", "#name"], variable);
     };
 
     /**
@@ -540,7 +540,7 @@ var Clockwork = (function () {
 
     function implementPreset(name, type) {
         var newone = inheritObject(presets[type]);
-        newone.vars["name"] = name;
+        newone.vars["#name"] = name;
         newone.spriteholder = undefined;
         return newone;
     };
@@ -548,7 +548,7 @@ var Clockwork = (function () {
     function implementMultiplePresets(name, types) {
         inheritMultiplePresets("@dynamic_" + name, types);
         var newone = inheritObject(presets["@dynamic_" + name]);
-        newone.vars["name"] = name;
+        newone.vars["#name"] = name;
         newone.spriteholder = undefined;
         return newone;
     };
