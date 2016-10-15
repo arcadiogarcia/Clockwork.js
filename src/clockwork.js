@@ -666,7 +666,7 @@ var Clockwork = (function () {
             deleteSprites();
             //Just in case?
             animationEngine.clear();
-            objects = loadLevelObjects(levels[n]).objects;
+            objects = loadLevelObjects(levels[n]);
             assignSprites();
             clockwork.setup();
         }, 5);
@@ -674,11 +674,11 @@ var Clockwork = (function () {
 
     /**
     * Loads a level
-    * @param {String} name - The level id
+    * @param {String} id - The level id
     */
-    this.loadLevelByID = function (name) {
-        for (var i = 0; i < levelsNames.length; i++) {
-            if (name == levelsNames[i]) {
+    this.loadLevelByID = function (id) {
+        for (var i = 0; i < parsedLevels.length; i++) {
+            if (id == parsedLevels[i].id) {
                 clockwork.loadLevel(i);
                 return;
             }
@@ -695,8 +695,7 @@ var Clockwork = (function () {
     this.loadLevelsFromXML = function (url, callback) {
         loadXMLFile(url, function (xmlDoc) {
             for (var i = 0; i < xmlDoc.getElementsByTagName("level").length; i++) {
-                levels.push(xmlDoc.getElementsByTagName("level")[i]);
-                levelsNames.push(xmlDoc.getElementsByTagName("level")[i].getAttributeNode("id").value);
+                parsedLevels.push(XMLlevelToJson(xmlDoc.getElementsByTagName("level")[i]));
             }
         }, callback);
     };
@@ -712,52 +711,87 @@ var Clockwork = (function () {
         var xmlDoc = (new DOMParser()).parseFromString(data, "text/xml");
         names = names || [];
         for (var i = 0; i < xmlDoc.getElementsByTagName("level").length; i++) {
-            levels.push(xmlDoc.getElementsByTagName("level")[i]);
-            levelsNames.push(names[i] || xmlDoc.getElementsByTagName("level")[i].getAttributeNode("id").value);
+            parsedLevels.push(XMLlevelToJson(xmlDoc.getElementsByTagName("level")[i]));
         }
         callback();
     };
 
-    function loadLevelObjects(thislevel) {
+    /**
+    * Loads the levels data from a JSON object
+    * @param {String} data - The xml string
+    * @param {Function} callback - A callback function
+    * @param {String array} names- Names to be used for the levels
+    */
+
+    this.loadLevelsFromJSONobject = function (data, callback) {
+        parsedLevels = parsedLevels.concat(data);
+        callback();
+    };
+
+    function XMLlevelToJson(thislevel) {
         var level = {};
+        level.id = thislevel.getAttributeNode("id").value;
         level.objects = [];
         for (var j = 0; j < thislevel.getElementsByTagName("object").length; j++) {
             var thisobject = thislevel.getElementsByTagName("object")[j];
-            var object;
+            var object = {};
+            //Set name
+            object.name = thisobject.getAttributeNode("name").value;
+            //Set type
             if (thisobject.getElementsByTagName("type").length > 0) {
+                //Composition
                 var names = [];
                 for (var k = 0; k < thisobject.getElementsByTagName("type").length; k++) {
                     names.push(thisobject.getElementsByTagName("type")[k].getAttributeNode("id").value);
                 }
-                object = implementMultiplePresets(thisobject.getAttributeNode("name").value, names);
+                object.type = names;
             } else {
-                object = implementPreset(thisobject.getAttributeNode("name").value, thisobject.getAttributeNode("type").value);
+                //Inheritance
+                object.type = thisobject.getAttributeNode("type").value;
             }
-            if (thisobject.getAttributeNode("spritesheet") != undefined) {
-                object.sprite = thisobject.getAttributeNode("spritesheet").value;
-            }
-            if (thisobject.getAttributeNode("static") != undefined) {
-                if (thisobject.getAttributeNode("static").value == "true") {
-                    object.isstatic = true;
-                } else {
-                    object.isstatic = false;
-                }
-            } else {
-                object.isstatic = false;
-            }
-            object.setVar("#x", +thisobject.getAttributeNode("x").value);
-            object.setVar("#y", +thisobject.getAttributeNode("y").value);
-            if (thisobject.getAttributeNode("z") != undefined) {
-                object.setVar("#z", +(thisobject.getAttributeNode("z").value));
-            } else {
-                object.setVar("#z", 0);
-            }
+            //Set spritesheet
+            object.sprite = thisobject.getAttributeNode("spritesheet") ? thisobject.getAttributeNode("spritesheet").value : null;
+            //Set whether the object is static
+            object.isstatic = thisobject.getAttributeNode("static") ? thisobject.getAttributeNode("static").value : null;
+            //Set x,y,z
+            object.x = +thisobject.getAttributeNode("x").value;
+            object.y = +thisobject.getAttributeNode("y").value;
+            object.z = thisobject.getAttributeNode("z") ? (+thisobject.getAttributeNode("z").value) : null;
+            //Set vars
             if (thisobject.getAttributeNode("vars")) {
-                addJSONparameters(object.vars, thisobject.getAttributeNode("vars").value);
+                object.vars = thisobject.getAttributeNode("vars").value;
+            } else {
+                object.vars = "{}";
             }
             level.objects.push(object);
         }
         return level;
+    }
+
+    function loadLevelObjects(thislevel) {
+        return thislevel.objects.map(function (o) {
+            var object;
+            if (o.type instanceof Array) {
+                object = implementMultiplePresets(o.name, o.type);
+            } else {
+                object = implementPreset(o.name, o.type);
+            }
+            if (o.sprite != null) {
+                object.sprite = o.sprite;
+            }
+            if (o.isstatic != null) {
+                object.isstatic = o.isstatic;
+            }
+            object.setVar("#x", o.x);
+            object.setVar("#y", o.y);
+            if (o.z != undefined) {
+                object.setVar("#z", o.z);
+            } else {
+                object.setVar("#z", 0);
+            }
+            addJSONparameters(object.vars, o.vars);
+            return object;
+        });
     }
     //The load queue is like a semaphore in C!
     //It starts as 0, and it is incremented (wait) for each resource that must be loaded
