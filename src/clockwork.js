@@ -13,8 +13,7 @@ var Clockwork = (function () {
     //The engine global variables
     var globalvars = {};
 
-    var levels = [];
-    var levelsNames = [];
+    var parsedLevels = [];
     var currentLevel = 0;
 
     var fps = 0;
@@ -666,7 +665,7 @@ var Clockwork = (function () {
             deleteSprites();
             //Just in case?
             animationEngine.clear();
-            objects = loadLevelObjects(levels[n]);
+            objects = loadLevelObjects(parsedLevels[n]);
             assignSprites();
             clockwork.setup();
         }, 5);
