@@ -110,9 +110,31 @@ var Clockwork = (function () {
 *
 */
     this.setup = function () {
-        clockwork.execute_event("#setup");
-        checkLoadQueue();
+        objects.asyncForEach(function (x, cb) {
+            var lock = loadQueue(cb);//When everything is unlocked, execute the callback and iterate to the next
+            lock.loader = clockwork.loader;
+            x.execute_event("#setup", lock);
+            lock.check();//In case the event ignores the lock
+        }, function () {//When eveything is loaded, start the main loop and hide the loader
+            intervalholder = setInterval(loop, Math.round(1000 / fps));
+            if (clockwork.loader) {
+                clockwork.loader.hide();
+            }
+        });
     };
+
+    //Useful when you need to perform async operations on each of the elements of an array, but in strict order, and execute a callback at the end
+    Object.defineProperty(Array.prototype, 'asyncForEach', {
+        enumerable: false,
+        value: function (action, cb, index) {
+            var i = index || 0;
+            if (i >= this.length) {
+                return cb();
+            }
+            var that = this;
+            return action(this[i], function () { that.asyncForEach(action, cb, i + 1); });
+        }
+    });
 
     /**
   *Pauses the execution of the engine
@@ -410,6 +432,7 @@ var Clockwork = (function () {
                             shapesBody[k] = value;
                             shapesBody[k].x += this.vars["#x"];
                             shapesBody[k].y += this.vars["#y"];
+                            shapesBody[k].z += this.vars["#z"];
                             shapesBody[k]["#tag"] = tag;
                         }
                     }
@@ -421,6 +444,9 @@ var Clockwork = (function () {
                 } else {
                     debugLog("Event handler " + name + " does not exist in " + this.name, 2);
                 }
+            },
+            do: function (name, args) {
+                return this.execute_event(name, args);
             },
             instanceOf: function (name) {
                 if (this.name == name) {
@@ -448,9 +474,9 @@ var Clockwork = (function () {
             collisionChanged: function (name) {
                 this.vars["#moveflag"] = true;
             },
-            getVarKeys:function(){
-                var keys=[];
-                for(var k in this.vars){
+            getVarKeys: function () {
+                var keys = [];
+                for (var k in this.vars) {
                     keys.push(k);
                 }
                 return keys;
@@ -642,7 +668,7 @@ var Clockwork = (function () {
     }
 
     this.listObjects = function () {
-        return objects.map(function(x){return x.getVar("#name")});
+        return objects.map(function (x) { return x.getVar("#name") });
     }
 
     /**
@@ -792,25 +818,29 @@ var Clockwork = (function () {
             return object;
         });
     }
-    //The load queue is like a semaphore in C!
-    //It starts as 0, and it is incremented (wait) for each resource that must be loaded
-    //Then it is increased for each loaded resource (signal), and if it is 0 again the engine continues
-    //This avoids to start beofre every asset is loaded
-    function addLoadQueue() {
-        loading++;
-    };
-    function removeLoadQueue() {
-        loading--;
-        checkLoadQueue();
-    };
-    function checkLoadQueue() {
-        if (loading == 0 && started == true) {
-            intervalholder = setInterval(loop, Math.round(1000 / fps));
-            if (clockwork.loader) {
-                clockwork.loader.hide();
-            }
-        }
+
+    var loadQueue = function (callback) {
+        var value = 0;
+        var used = 0;
+        return {
+            release: function () {
+                value--;
+                if (value == 0) {  //If it is not locked
+                    callback();
+                }
+            },
+            lock: function (cb) {
+                value++;
+                used = 1;
+            },
+            check: function () {  //In case lock has not been called
+                if (used == 0) {
+                    callback();
+                }
+            },
+        };
     }
+
 
     /**
     *Gets an object using its handler
@@ -887,6 +917,7 @@ var Clockwork = (function () {
         }
         return result.filter(function (x) { return x !== undefined });
     };
+    this.do = this.execute_event;
 
     //..........................
     //     Colisions
@@ -1014,4 +1045,3 @@ var Clockwork = (function () {
     }
 
 });
-
