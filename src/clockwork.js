@@ -777,7 +777,7 @@ var Clockwork = (function () {
             //Set spritesheet
             object.sprite = thisobject.getAttributeNode("spritesheet") ? thisobject.getAttributeNode("spritesheet").value : null;
             //Set whether the object is static
-            object.isstatic = thisobject.getAttributeNode("static") ? thisobject.getAttributeNode("static").value : null;
+            object.isstatic = thisobject.getAttributeNode("static") != null;
             //Set x,y,z
             object.x = +thisobject.getAttributeNode("x").value;
             object.y = +thisobject.getAttributeNode("y").value;
