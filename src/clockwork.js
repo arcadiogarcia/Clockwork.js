@@ -25,6 +25,10 @@ var Clockwork = (function () {
     //The animation engine used
     var animationEngine;
 
+    //Is the game code trying to exit the current level?
+    var exitFlag = false;
+    var exitValue = Symbol("exitValue");
+
     //Holds the setInterval return value
     var intervalholder;
 
@@ -42,12 +46,13 @@ var Clockwork = (function () {
     }
 
     //The algorithm used to when detecting the collisions
+    var moved = [];
     var collisionAlgorithm = function (objects, calculate) {
-        var moved = [];
         for (var i = 0; i < objects.length; i++) {
-            if (objects[i] != undefined && !isEmpty(objects[i].collision)) {
-                moved[i] = objects[i].vars["#moveflag"];
-                objects[i].vars["#moveflag"] = false;
+            var firstObject = objects[i];
+            if (firstObject != undefined && !isEmpty(firstObject.collision)) {
+                moved[i] = firstObject.vars["#moveflag"];
+                firstObject.vars["#moveflag"] = false;
                 if (collisionCache[i] === undefined) {
                     collisionCache[i] = [];
                 }
@@ -55,19 +60,19 @@ var Clockwork = (function () {
                 for (var j = 0; j < objects.length; j++) {
                     var secondObject = objects[j];
                     if (i != j && objects[j] != undefined && !isEmpty(objects[j].collision) && objects[i] != undefined) {
-                        if (!(moved[i] == false && (moved[j] || objects[j].vars["#moveflag"]) == false)) {
-                            thisCache[j] = calculate(i, j);
-                            if (thisCache[j] == "#exit") {
-                                return "#exit";
+                        if (!(moved[i] == false && (moved[j] || secondObject.vars["#moveflag"]) == false)) {
+                            thisCache[j] = calculate(firstObject, secondObject);
+                            if (thisCache[j] === exitValue) {
+                                return exitValue;
                             }
                         } else {
                             var cache = thisCache[j];
                             for (var k = 0; k < cache.length; k++) {
-                                if (objects[i].execute_event("#collide", cache[k].a) == "#exit") {
-                                    return "#exit";
+                                if (firstObject.execute_event("#collide", cache[k].a) == exitValue) {
+                                    return exitValue;
                                 }
-                                if (objects[j].execute_event("#collide", cache[k].b) == "#exit") {
-                                    return "#exit";
+                                if (secondObject.execute_event("#collide", cache[k].b) == exitValue) {
+                                    return exitValue;
                                 }
                             }
                         }
@@ -104,6 +109,10 @@ var Clockwork = (function () {
         this.setEngineVar("#DOM", DOMelement);
         clockwork.loadLevel(0);
     };
+
+    this.fps = function () {
+        return fps;
+    }
 
     /**
 *Starts (or restarts) the engine execution with the data loaded
@@ -420,6 +429,7 @@ var Clockwork = (function () {
                         break;
                 }
                 this.vars[variable] = value;
+                this.execute_event("#setVar", { key: variable, value: value })
             },
             getVar: function (variable) {
                 return this.vars[variable];
@@ -487,6 +497,7 @@ var Clockwork = (function () {
     function inheritPreset(name, parent) {
         presets[name] = inheritObject(presets[parent]);
         presets[name].name = name;
+        presets[name].parent = name;
         presets[name].prototypes = [presets[parent]];
         presets[name].vars = inheritObject(presets[parent].vars);
         presets[name].eventfunction = inheritObject(presets[parent].eventfunction);
@@ -496,6 +507,7 @@ var Clockwork = (function () {
     function inheritMultiplePresets(name, parents) {
         var parentsPresets = parents.map(function (x) { return presets[x]; });
         createPreset(name);
+        presets[name].parents = parentsPresets;
         presets[name].prototypes = parentsPresets;
         for (var i = 0; i < parentsPresets.length; i++) {
             if (parentsPresets[i].sprite) {
@@ -534,17 +546,13 @@ var Clockwork = (function () {
 
 
 
-    function addPresetHandler(name, event, somefunction) {
-        if (presets[name].eventfunctionArray && presets[name].eventfunctionArray[event]) {
-            var functionArray = presets[name].eventfunctionArray[event];
-            functionArray.push(somefunction);
-            presets[name].eventfunction[event] = (function (functionArray) {
-                return function (args) {
-                    for (var i = 0; i < functionArray.length; i++) {
-                        functionArray[i].call(this, args);
-                    };
-                };
-            })(functionArray);
+    function addPresetHandler(name, event, somefunction, override) {
+        if (override == false) {
+            var oldHandler = presets[name].eventfunction[event];
+            presets[name].eventfunction[event] = function (args) {
+                oldHandler.call(this, args);
+                somefunction.call(this, args);
+            };
         } else {
             presets[name].eventfunction[event] = somefunction;
         }
@@ -622,7 +630,7 @@ var Clockwork = (function () {
 
             if (typeof thispreset.events != "undefined") {
                 for (var j = 0; j < thispreset.events.length; j++) {
-                    addPresetHandler(thispreset.name, thispreset.events[j].name, thispreset.events[j].code);
+                    addPresetHandler(thispreset.name, thispreset.events[j].name, thispreset.events[j].code, thispreset.events[j].override === false ? false : true);
                 }
             }
         }
@@ -650,6 +658,7 @@ var Clockwork = (function () {
             object.setVar(name, vars[name]);
         }
         object.execute_event("#setup");
+        object.handler = objects.length;
         objects.push(object);
         return object;
     }
@@ -687,12 +696,14 @@ var Clockwork = (function () {
         if (clockwork.loader) {
             clockwork.loader.show();
         }
+        exitFlag = true;
         setTimeout(function () {
             deleteSprites();
             //Just in case?
             animationEngine.clear();
             objects = loadLevelObjects(parsedLevels[n]);
             assignSprites();
+            exitFlag = false;
             clockwork.setup();
         }, 5);
     };
@@ -708,6 +719,10 @@ var Clockwork = (function () {
                 return;
             }
         }
+    };
+
+    this.reloadLevel = function (id) {
+        clockwork.loadLevel(currentLevel);
     };
 
 
@@ -794,7 +809,7 @@ var Clockwork = (function () {
     }
 
     function loadLevelObjects(thislevel) {
-        return thislevel.objects.map(function (o) {
+        return thislevel.objects.map(function (o,i) {
             var object;
             if (o.type instanceof Array) {
                 object = implementMultiplePresets(o.name, o.type);
@@ -815,6 +830,7 @@ var Clockwork = (function () {
                 object.setVar("#z", 0);
             }
             addJSONparameters(object.vars, o.vars);
+            object.handler = i;
             return object;
         });
     }
@@ -883,11 +899,11 @@ var Clockwork = (function () {
             animationEngine.tick(1000 / fps);
         }
 
-        if (processCollisions() == "#exit") {
+        if (processCollisions() == exitValue || exitFlag) {
             return;
         }
 
-        if (clockwork.execute_event("#loop") == "#exit") {
+        if (clockwork.execute_event("#loop") == exitValue || exitFlag) {
             return;
         }
 
@@ -905,19 +921,20 @@ var Clockwork = (function () {
         for (var i = 0; i < objects.length; i++) {
             var body = objects[i];
             if (body != undefined) {
-                if (body.execute_event("#", { "name": name, "args": e_args }) == "#exit") {
-                    return "#exit";
-                }
+                body.execute_event("#", { "name": name, "args": e_args });
                 r = body.execute_event(name, e_args);
-                if (r == "#exit") {
-                    return "#exit";
-                }
                 result.push(r);
             }
         }
         return result.filter(function (x) { return x !== undefined });
     };
     this.do = this.execute_event;
+
+
+
+    this.exitingLevel = function () {
+        return exitFlag === true;
+    }
 
     //..........................
     //     Colisions
@@ -957,13 +974,15 @@ var Clockwork = (function () {
         return collisionAlgorithm = algorithm;
     };
 
+
+
     /**
     *Checks if a given collider collides with any objects in the level
     *@param {String} type - The collider type
     *@param {Object} collider - The collider
     */
-    var collisionData = {};
     this.collisionQuery = function (type, collider) {
+        var collisionData = {};
         var result = [];
         var shape2 = type;
         for (var i = 0; i < objects.length; i++) {
@@ -985,12 +1004,39 @@ var Clockwork = (function () {
         }
         return result;
     };
+    /**
+    *Checks if a given collider collides with the provided objects
+    *@param {String} type - The collider type
+    *@param {Object} collider - The collider
+    *@param {Array} queryObjects - The objects
+    */
+    this.collisionQueryObjects = function (type, collider, queryObjects) {
+        var collisionData = {};
+        var result = [];
+        var shape2 = type;
+        for (var i = 0; i < queryObjects.length; i++) {
+            b1 = objects[queryObjects[i]];
+            if (b1 != undefined) {
+                //For each kind of shape
+                for (var shape1 in b1.collision) {
+                    shapesBody1 = b1.collision[shape1];
+                    //For each shape of that kind
+                    for (var k = 0; k < shapesBody1.length; k++) {
+                        bodyShape1 = shapesBody1[k];
+                        //Check if they collide
+                        if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, collider, collisionData) == true) {
+                            result.push(i);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    };
 
     //Outside for optimization purposes
     var emptyCache = [];
     var cache;
-    var b1;
-    var b2;
     var x1;
     var y1;
     var z1;
@@ -1003,10 +1049,8 @@ var Clockwork = (function () {
     var bodyShape2;
     var collisionData = {};
     var shape1, shape2, k, l;
-    function checkCollision(i, j) {
+    function checkCollision(b1, b2) {
         cache = emptyCache;
-        b1 = objects[i];
-        b2 = objects[j];
         //For each kind of shape
         for (shape1 in b1.collision) {
             for (shape2 in b2.collision) {
@@ -1020,15 +1064,15 @@ var Clockwork = (function () {
                         //Check if they collide
                         if (collisions.detect[shape1] != undefined && collisions.detect[shape1][shape2] != undefined && collisions.detect[shape1][shape2](bodyShape1, bodyShape2, collisionData) == true) {
                             //Send the info to the #collide event handlers
-                            if (b1.execute_event("#collide", { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }) == "#exit") {
-                                return "#exit";
+                            if (b1.execute_event("#collide", { object: b2.handler, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }) == exitValue) {
+                                return exitValue;
                             }
-                            if (b2.execute_event("#collide", { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: collisionData, shape1tag: bodyShape2["#tag"], shape2tag: bodyShape1["#tag"] }) == "#exit") {
-                                return "#exit";
+                            if (b2.execute_event("#collide", { object:b1.handler, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: collisionData, shape1tag: bodyShape2["#tag"], shape2tag: bodyShape1["#tag"] }) == exitValue) {
+                                return exitValue;
                             }
                             if (cache.length == 0) {
                                 cache = [];
-                                cache.push({ a: { object: j, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }, b: { object: i, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] } });
+                                cache.push({ a: { object:b2.handler, shape1kind: shape1, shape2kind: shape2, shape1id: k, shape2id: l, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] }, b: { object: b1.handler, shape1kind: shape2, shape2kind: shape1, shape1id: l, shape2id: k, data: collisionData, shape1tag: bodyShape1["#tag"], shape2tag: bodyShape2["#tag"] } });
                             }
                         }
                     }
