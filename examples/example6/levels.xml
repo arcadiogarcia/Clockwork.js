@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<levels>
+  <level id="level">
+    <object name="lightning" type="lightSystem" x="0" y="0" ></object>
+    <object name="light" type="light" x="0" y="0" ></object>
+    <object name="pointer" type="pointerAPI" x="0" y="0" ></object>
+  </level>
+</levels>
